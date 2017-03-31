@@ -757,7 +757,7 @@ public class IndexerV1
 	                res = stt.executeQuery("SELECT term"
 	                		+ " FROM tag_index"
 	                		+ " WHERE"
-	                		+ " term = '" + term + "' AND"
+	                		+ " term = '" + termStem + "' AND"
 	                		+ " docID = " + currID);
 	                
 	                if (res.next() == false)
