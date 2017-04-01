@@ -1,13 +1,15 @@
 How-To: Crawler
 
-1- Create a folder called HTMLs under drive D (D:\HTMLs)
+(1) Create a folder called HTMLs under drive D (D:\HTMLs)
 
-2- Create a text file under drive D called links (D:\links.txt) and type in at least one URL. (Each URL is written in a new line)
+(2) Create a text file under drive D called links (D:\links.txt) and type in at least one URL. (Each URL is written in a new line)
 
-3- Create a text file under drive D called state (D:\state.txt) and type in 0.
+(3) Create a text file under drive D called state (D:\state.txt) and type in 0.
 
-4- All jar files in the Dependancies folder must be added to the project's build path
+(4) All jar files in the Dependancies folder must be added to the project's build path
 
+NOTE: 
+Multithreading for the crawler can be found in code, but it's still not operational. 
 
 ******
 
