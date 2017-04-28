@@ -8,7 +8,7 @@ function query_bank()
 {
     global $connection;
     
-    $sql = "SELECT * FROM query ORDER BY query_count DESC";
+    $sql = "SELECT * FROM queries ORDER BY query_count DESC";
     
     $result = $connection->query($sql);
     

@@ -30,32 +30,50 @@ body
     }
 }
 
+#header
+{
+    position: relative;
+    top: 0;
+    left: 0;
+    
+    /*NOTE to self
+        Wonder why couldn't use height as percentage, but could for width
+        when #header was outside #background. Yet, px is used for height
+        just to avoid compression when window resized
+    */
+    height: 100px;      
+    width: 100%;
+    
+    background-color: white;
+}
+
 #logo
 {
-    position: relative;     /*to make the childs relative to it*/
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;     /*relative in heigth and width to parent (#header)*/
+    top: 0%;
+    left: 0%;
     
-    /*dimenstions important for positioning of childs relative to parent*/
-    height: 500px;
-    width: 500px;
+    /*Careful! Making the height and width here percentages means that
+        all the child with absolute (thus relative in position) will change their positions
+        when window resized because #logo itself changes its width and height as they are 
+        percentages. NOTE, even though width of #header is relative, everything stays
+        in place even when window resizing because top and left are set to 0
+    */
+    height: 100px;
+    width: 250px;
     
     margin: 0px 0px 0px 0px;
 }
 
 #logo h1
-{
-    /*!important is for disabling javascript from overriding*/
-    
+{    
     position: absolute;     /*absolute as in position relative to parent (#logo)*/
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0%;
+    left: 8%;
     margin: 0px;
     
     font-family: 'Fascinate';
-    font-size: 1000%;
+    font-size: 450%;
     font-weight: normal;
     
     -webkit-background-clip: text !important;
@@ -66,41 +84,36 @@ body
 }
 
 #logo h2
-{
+{   
+    /*Because parent logo has width and height set in px, here leaveing top and bottom
+        with percentage values is safe as in resizing the window won't relocate the element
+    */
     position: absolute;     /*absolute as in position relative to parent (#logo)*/
-    top: 39%;
-    right: 2%;
-    transform: translate(-50%, -50%);
+    top: 42%;
+    left: 78%;
     margin: 0px;
     
     font-family: 'Pacifico';
-    font-size: 200%;
+    font-size: 150%;
     font-weight: normal;
     
     color: dimgray;
 }
 
-#logo p
-{
-    position: fixed;
-    top: 48%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0px;
-    
-    font-family: 'Lato';
-    font-size: 100%;
-    
-    color: black;
-}
-
 #search
 {
+    position: absolute;     /*absolute as in position relative to parent (#header)*/
+    
+    /*Resorted to pixels because #search must be away by a certain amount in top and left
+        from the boundaries of (#header), however, #header has its width 100% because we 
+        we want to guarantee that it fills the entire width of the screen on the screen, thus
+        there is no escaping the location of (#search) changing when window resizing except
+        by setting top and left with fixed px amounts and not percentages
+    */
+    top: 30px;
+    left: 250px;
+    
     font-family: sans-serif;
-    position: fixed;
-    top: 55%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .typeahead, .tt-query, .tt-hint 

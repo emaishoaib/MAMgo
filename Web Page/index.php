@@ -44,7 +44,7 @@
                 <?php $bank = query_bank(); ?>
                 
                 <script>
-                    // Defining the dataset
+                    // Defining the dataset, encoding in JSON for Java variable
                     var bank = <?php echo json_encode($bank) ?>;                    
                 </script>
                 
@@ -54,12 +54,11 @@
                 
                 <!--The input form to take the query from user. Class is set
                         as so based on Twitter's typeahead.js-->
-                <input type="text" class ="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder = "Search...">
-                
-                <!--Search button as a search icon-->
-                <a href = "#">
-                    <img class = "search-btn" src = "img/search-icon.png">
-                </a>
+                <form method = "post">
+                    <input type="text" name="search_bar" class ="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder = "Search...">
+                    
+                    <input type="image" src="img/search-icon.png" class="search-btn" alt="Submit" >
+                </form>
                 
                 <!--Custom JavaScript enabling 'Enter' to search-->
                 <script>
@@ -78,17 +77,21 @@
                         $(this).addClass('tt-cursor');
                     });
                 </script>
+                            
+                <?php
+                    if (isset($_POST['search_bar']))
+                    {
+                        $location = "Location: results.php?query=";
+                        $query = $_POST["search_bar"];
+                        
+                        $location .= $query;
+
+                        header($location);
+                    }
+                ?>
                 
             </div>
-            
-            <?php
-                if (isset($_POST['query']))
-                {
-                    insert_query();
-                    search();
-                }
-            ?>
-        
+
         </div>
         
     </body>
