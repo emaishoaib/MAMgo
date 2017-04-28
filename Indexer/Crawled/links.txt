@@ -1,2 +1,1 @@
-cheetah.com
-wolf.com
+https://www.physics.org/

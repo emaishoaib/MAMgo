@@ -38,7 +38,7 @@ public class IndexerV1
 		
 		String url = "jdbc:mysql://localhost:3306/";
 		String user = "root";
-		String password = "0ASD";
+		String password = "";
 		
 		//Reading current state number
 		String fileText;
