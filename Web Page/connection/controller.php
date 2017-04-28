@@ -31,8 +31,44 @@ function query_bank()
     return $bank;
 }
 
-function insert_query()
+//Function to add the query to the database, and if existent, then just
+//      update count
+function add_query()
 {
+    global $connection;
+    
+    $query = $_GET['query'];
+    
+    $sql = "SELECT * FROM queries WHERE query_text = '$query'";
+    
+    $result = $connection->query($sql);
+    
+    if ($result == false)
+        echo $connection->error;
+    
+    $query_check = mysqli_num_rows($result);
+    if ($query_check != 0)
+    {        
+        $sql = "UPDATE queries 
+        SET query_count = query_count + 1 
+        WHERE query_text = '$query'";
+        
+        $result = $connection->query($sql);
+        
+        if ($result == false)
+            echo $connection->error;
+    }
+    else
+    {
+        $sql = "INSERT INTO queries (query_text, query_count)
+        VALUES ('$query', 1)";
+        
+        $result = $connection->query($sql);
+        
+        if ($result == false)
+            $result = $connection->query($sql);
+    }
+    
 }
 
 function search()

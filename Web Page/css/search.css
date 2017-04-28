@@ -42,6 +42,8 @@ body
     width: 500px;
     
     margin: 0px 0px 0px 0px;
+    
+    cursor: hand;
 }
 
 #logo h1
@@ -108,6 +110,14 @@ body
     /*Somehow there are so many things atuomatically set
         like position being set to relative - maybe it has to do
         with twitter's tyepahead.js, though doubtful*/
+    
+    /*This could be the reason why reset.css was needed, and why if we
+        add it now, so many things go wrong, because quite simply, all
+        this CSS written so far does not handle the things alread handled
+        before applying reset.css, which zeros them upon applying. This also
+        explains why there are things with margin out of nowhere till we
+        remove the margins manually
+    */
     
     width: 396px;
     padding: 12px 45px 12px 20px;
