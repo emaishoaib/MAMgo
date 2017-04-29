@@ -113,7 +113,7 @@ body
     top: 30px;
     left: 250px;
     
-    font-family: sans-serif;
+    font-family: "Lato";
 }
 
 .typeahead, .tt-query, .tt-hint 
@@ -199,4 +199,72 @@ body
     right: 3%;
     width: 20px;
     height: 20px;    
+}
+
+#results
+{
+    position: relative;
+    top: 20px;     /*Don't want height to change with window resizing, thus px*/
+    left: 50%;     /*Want the list to keep relocating as window resized, thus %*/
+    transform: translate(-50%);
+    
+    height: 500px;
+    width: 500px;
+            
+    font-family: "Lato";
+}
+
+#result_record
+{
+    background-color: white;
+    
+    border: none;
+    border-radius: 2px;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+    
+    list-style: none;
+    
+    height: 100px;
+    
+    padding: 10px 20px 10px 20px;
+
+}
+
+#result_title
+{
+    padding: 0px 0px 0px 0px;
+    
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#result_title a
+{
+    text-decoration: none;
+    
+    color: blue;
+}
+
+#result_title a:hover
+{
+    cursor: pointer;
+    
+    text-decoration: underline;
+}
+
+#result_details
+{
+    padding: 0px 0px 0px 0px;
+    
+    list-style: none;
+}
+
+#result_link
+{
+    padding: 4px 0px 0px 0px;
+}
+
+#result_description
+{
+    padding: 4px 0px 0px 0px;
 }

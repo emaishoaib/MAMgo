@@ -26,7 +26,7 @@ function query_bank()
     }
     
     // Freeing $result to be able to perform another fetch throughout controller.php
-    $result->close();
+    //$result->close();
             
     return $bank;
 }
@@ -71,8 +71,33 @@ function add_query()
     
 }
 
-function search()
+// Getting the search results as outputted by query processor from
+//      'results' view
+function get_results()
 {
+    global $connection;
+    
+    $sql = "SELECT * FROM results_view";
+    
+    $result = $connection->query($sql);
+    
+    if ($result == false)
+        echo $connection->error;
+    
+    return $result;
+}
+
+//Dropping the 'results' view from DB
+function drop_results()
+{
+    global $connection;
+    
+    $sql = "DROP VIEW results_view";
+    
+    $result = $connection->query($sql);
+    
+    if ($result == false)
+        echo $connection->error;
 }
 
 ?>

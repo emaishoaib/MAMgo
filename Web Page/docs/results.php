@@ -94,16 +94,6 @@
                     </script>
                     
                 <?php                               
-                    if (isset($_GET['query']))
-                    {
-                        // Send to Java query for processing
-                        // Get back array from Java
-                ?>
-                    <!--HTML code for displaying array results-->
-                    
-                <?php
-                    }
-                               
                     //If search done, then reload page with new query in URL
                     if (isset($_POST['search_bar']))
                     {
@@ -122,7 +112,68 @@
             
             <div id = "results">
                 
-                <!---Results appear here-->
+                <!---Displaying search results-->
+                
+                <?php
+                
+                    //Getting the results
+                    $result_records = get_results();
+                    
+                    if (mysqli_num_rows($result_records) == 0)
+                    {
+                ?>
+                
+                <!--Message conveying no searh results found-->
+                <p>No results found</p>
+                
+                <?php
+                    }
+                    else
+                    {
+                        while ($row = $result_records->fetch_assoc())
+                        {
+                ?>
+                
+                <!--This part of HTML is repeated for each record (row) 
+                        till all rows of 'results' view are retrieved-->
+                <ul id = "result_record">
+                    
+                    <li id = "result_title">
+                        <a href = "<?php echo $row['docLink']?>">
+                            <?php echo $row['docTitle']?>
+                        </a>
+                    </li>
+                    
+                    <ul id = "result_details">
+                        
+                        <li id = "result_link">
+                            <?php echo $row['docLink']?>
+                        </li>
+                        
+                        
+                        <li id = "result_description">
+                            
+                            <!--The following needs to be done
+                                    1- Get HTML of resp. docID
+                                    2- Parse only details of HTML
+                                    3- Get string with all terms
+                                    4- Display string (truncating and bolding terms)
+                            -->
+                            Description unavailable!
+                        
+                        </li>
+                        
+                    </ul>
+                    
+                </ul>
+                
+                <?php
+                        }
+                    }
+                
+                    //Dropping the 'results' view from DB
+                    //drop_results();
+                ?>
                 
             </div>
         
