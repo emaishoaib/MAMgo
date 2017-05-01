@@ -336,13 +336,14 @@ body
     line-height: 38px;
     text-align: center;
     
-    background-color: lightgray;
+    background-color: white;
     border-radius: 10%;
+    border: 1px solid dimgray;
 }
 
 .pagination li.active
 {
-    background-color: #000000;
+    background-color: dimgray;
     color: #FFFFFF;
 }
 
