@@ -87,17 +87,4 @@ function get_results()
     return $result;
 }
 
-//Dropping the 'results' view from DB
-function drop_results()
-{
-    global $connection;
-    
-    $sql = "DROP VIEW results_view";
-    
-    $result = $connection->query($sql);
-    
-    if ($result == false)
-        echo $connection->error;
-}
-
 ?>

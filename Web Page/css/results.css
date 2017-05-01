@@ -44,7 +44,7 @@ body
     height: 100px;      
     width: 100%;
     
-    background-color: white;
+    background-color: #FFFFFF;
 }
 
 #logo
@@ -204,18 +204,39 @@ body
 #results
 {
     position: relative;
-    top: 20px;     /*Don't want height to change with window resizing, thus px*/
-    left: 50%;     /*Want the list to keep relocating as window resized, thus %*/
-    transform: translate(-50%);
     
-    height: 500px;
-    width: 500px;
+    /*Don't want height to change with window resizing, thus px*/
+    top: 0px;
+    padding-top: 10px;
+    
+    /* Commented out because width set to 100% instead of 500px;
+    left: 50%;     /*Want the list to keep relocating as window resized, thus %* /
+    transform: translate(-50%);
+    */
+    
+    /*
+        100% for entire height of page
+        100px is height of header
+    */
+    height: calc(100% - 100px);   
+    width: 100%;
             
     font-family: "Lato";
+    
+    overflow: scroll;
 }
 
-#result_record
+.result_list
 {
+    padding: 0px;
+}
+
+.result_record
+{
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    
     background-color: white;
     
     border: none;
@@ -225,12 +246,15 @@ body
     list-style: none;
     
     height: 100px;
+    width: 500px;
     
+    /*The following padding and margin are worth looking at 
+        in Chrome's inspect*/
     padding: 10px 20px 10px 20px;
-
+    margin: 0px 0px 12px 0px;
 }
 
-#result_title
+.result_title
 {
     padding: 0px 0px 0px 0px;
     
@@ -238,33 +262,102 @@ body
     font-weight: bold;
 }
 
-#result_title a
+.result_title a
 {
     text-decoration: none;
     
     color: blue;
 }
 
-#result_title a:hover
+.result_title a:hover
 {
     cursor: pointer;
     
     text-decoration: underline;
 }
 
-#result_details
+.result_details
 {
     padding: 0px 0px 0px 0px;
     
     list-style: none;
 }
 
-#result_link
+.result_link
+{    
+    padding: 4px 0px 0px 0px;
+    
+    color: green;
+}
+
+.result_description
 {
     padding: 4px 0px 0px 0px;
 }
 
-#result_description
+#pages
 {
-    padding: 4px 0px 0px 0px;
+    /*
+        Careful! If position set to absolute as in to be relative to parent
+        (#results) that has position set as relative, then position of this
+        child (#pagination) will indeed be relative in position, BUT, notice
+        that (#results) has top:0px, and so (#pagination) will be relative to
+        the very top because the top of its parent is at 0px. Therefore, 
+        the position has to be relative, just like (#results).
+    */
+    position: relative;
+    top: 2%;
+    
+    height: 100px;
+    width: 100%;
+}
+    
+.pagination
+{  
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%);
+    
+    padding: 0px;
+    margin: 0px;
+}
+
+.pagination li
+{
+    display: inline-block;
+    
+    margin: 10px;
+
+    width: 40px;
+    height: 40px;
+    
+    font-family: "Lato";
+    line-height: 38px;
+    text-align: center;
+    
+    background-color: lightgray;
+    border-radius: 10%;
+}
+
+.pagination li.active
+{
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.pagination a
+{    
+    text-decoration: none;
+    color: dimgray;
+}
+
+.pagination li.active a
+{
+    color: white;
+}
+
+.pagination li:hover
+{
+    cursor: pointer;
 }

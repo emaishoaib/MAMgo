@@ -15,13 +15,13 @@
 <html>
     
     <head>
+        
         <!--Linking to CSS stylesheet-->
         <link href="../css/results.css" rel = "stylesheet">
         
-        <!--Scripts needed for custom scripts to work-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
+        <!--jQuery-->
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        
     </head>
     
     <body>
@@ -58,6 +58,7 @@
 
                     <!--Custom JavaScript based on Twitter's typeahead.js for 
                             suggestion mechanism; Bloodhound suggestion engine-->
+                    <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                     <script src="../js/sugg.js" type = "text/javascript"></script>
 
                     <?php
@@ -112,8 +113,6 @@
             
             <div id = "results">
                 
-                <!---Displaying search results-->
-                
                 <?php
                 
                     //Getting the results
@@ -130,53 +129,105 @@
                     }
                     else
                     {
+                ?>
+                
+                <ul class = "result_list">
+                
+                <?php
                         while ($row = $result_records->fetch_assoc())
                         {
                 ?>
                 
-                <!--This part of HTML is repeated for each record (row) 
-                        till all rows of 'results' view are retrieved-->
-                <ul id = "result_record">
-                    
-                    <li id = "result_title">
-                        <a href = "<?php echo $row['docLink']?>">
-                            <?php echo $row['docTitle']?>
-                        </a>
-                    </li>
-                    
-                    <ul id = "result_details">
+                    <!--This part of HTML is repeated for each record till 
+                            till all rows of 'results' view are retrieved.-->
+                    <ul class = "result_record">
                         
-                        <li id = "result_link">
-                            <?php echo $row['docLink']?>
+                        <li class = "result_title">
+                            <a href = "<?php echo $row['docLink']?>">
+                                <?php echo $row['docTitle']?>
+                            </a>
                         </li>
-                        
-                        
-                        <li id = "result_description">
-                            
-                            <!--The following needs to be done
-                                    1- Get HTML of resp. docID
-                                    2- Parse only details of HTML
-                                    3- Get string with all terms
-                                    4- Display string (truncating and bolding terms)
-                            -->
-                            Description unavailable!
-                        
-                        </li>
-                        
+
+                        <ul class = "result_details">
+
+                            <li class = "result_link">
+                                <?php echo $row['docLink']?>
+                            </li>
+
+
+                            <li class = "result_description">
+
+                                <!--The following needs to be done
+                                        1- Get HTML of resp. docID
+                                        2- Parse only details of HTML
+                                        3- Get string with all terms
+                                        4- Display string (truncating and bolding terms)
+                                -->
+                                Description unavailable!
+
+                            </li>
+
+                        </ul>
+
                     </ul>
-                    
-                </ul>
                 
                 <?php
                         }
-                    }
-                
-                    //Dropping the 'results' view from DB
-                    //drop_results();
                 ?>
                 
+                </ul>
+                
+                <?php
+                    }
+                ?>
+                
+                <div id="pages">
+                    <!--List of numbers for paginating, with each number being a
+                            link controlled by the script that follows-->
+                    <ul class="pagination">
+                        <!--1, 2, 3...... will come here based on the script
+                                that follows-->
+                    </ul>
+                </div>
+                
+                <!--Custom JavaScript for pagination using List.js-->
+                <script src="../js/list.js"></script>
+                
+                <script>
+                    var options = {
+                        
+                        //The class of the list containe. This is what
+                        //  contains all the items (list) to be pagianted
+                        listClass: "result_list",
+                        
+                        //The class of each list item; this class is within
+                        //  the class of the list container. This is what
+                        //  repeates itself many times, and is thus each
+                        //  list item of the pagination
+                        valueNames: ['result_record'],
+                        
+                        //Numebr of list items per page
+                        page: 10,
+                        
+                        //Enable pagination
+                        pagination: true
+                    }
+                    
+                    //Creating the paginated list
+                    var searchList = new List('results', options);
+                </script>
+                
+                <script>
+                    //Go to top of page when page link clicked (....)
+                    $(".pagination").click(function() {
+                        $('#results').scrollTop(0);
+                    });
+                </script>
+                
+            <!--(#results) div-->
             </div>
-        
+            
+        <!--(#background) div-->
         </div>
         
     </body>

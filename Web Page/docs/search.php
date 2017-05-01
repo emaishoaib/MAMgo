@@ -15,13 +15,13 @@
 <html>
     
     <head>
+        
         <!--Linking to CSS stylesheet-->
         <link href="../css/search.css" rel = "stylesheet">
         
-        <!--Scripts needed for custom scripts to work-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
+        <!--jQuery-->
+        <script src="http://code.jquery.com/jquery-latest.js"></script>>
+        
     </head>
     
     <body>
@@ -52,6 +52,7 @@
                 
                 <!--Custom JavaScript based on Twitter's typeahead.js for 
                         suggestion mechanism; Bloodhound suggestion engine-->
+                <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                 <script src="../js/sugg.js" type = "text/javascript"></script>
                 
                 <!--The input form to take the query from user. Class is set
