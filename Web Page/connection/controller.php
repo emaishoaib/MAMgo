@@ -87,4 +87,87 @@ function get_results()
     return $result;
 }
 
+// Sending the user entered query as a string to Java for processing,
+//      then getting the OK from Java
+function send_query($query)
+{
+    //PHP as client; Java as server
+    
+    //Host is local host
+    $address = "localhost";
+    
+    //The port to work on shall be 1235
+    $service_port = 1235;
+    
+    //Creating a TCP/IP socket
+    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    if ($socket === false) 
+    {
+        echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . "\n";
+    }
+    
+    //Connecting to specified address on specified port
+    $result = socket_connect($socket, $address, $service_port);
+    if ($result == false)
+    {
+        echo "socket_connect() failed.\nReason: ($result)". socket_strerror(socket_last_error($socket)) . "\n";
+    }
+    
+    //Sending query string over port
+    socket_write($socket, $query, strlen($query)) or die("Could not write query to port");
+    
+    //Closing the socket
+    socket_close($socket);
+    
+    /*Reading from socket was not done here because the PHP function
+        socket_read is a blocking function, meaning, everything stops
+        around it stops working until a time out happens or data is received.
+        Since the Java server side doesn't send any data till it reads,
+        and since socket_read would not let PHP to write, it is therefore
+        separated from the writing to socket part in PHP
+    */
+}
+
+// Receiving response from Java server
+function receive_response()
+{
+    //PHP as client; Java as server
+    
+    //Host is local host
+    $address = "localhost";
+    
+    //The port to work on shall be 1235
+    $service_port = 1236;
+    
+    //Creating a TCP/IP socket
+    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    if ($socket === false) 
+    {
+        echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . "\n";
+    }
+    
+    //Connecting to specified address on specified port
+    $result = socket_connect($socket, $address, $service_port);
+    if ($result == false)
+    {
+        echo "socket_connect() failed.\nReason: ($result)". socket_strerror(socket_last_error($socket)) . "\n";
+    }
+    
+    $out = '';
+    
+    while ($out = socket_read($socket, 1024, PHP_NORMAL_READ))
+    {
+        if(!$out)
+            break;
+        
+        if(strpos($out, "\n") !== false)
+            break;
+    }
+        
+    //Closing the socket
+    socket_close($socket);
+    
+    return $out;
+}
+
 ?>

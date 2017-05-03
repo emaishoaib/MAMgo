@@ -26,7 +26,6 @@
     
     <body>
 
-        
         <div id = "background">
             
             <!--Custom JavaScript for enabling color gradient change-->
@@ -51,16 +50,17 @@
                 </script>
                 
                 <!--Custom JavaScript based on Twitter's typeahead.js for 
-                        suggestion mechanism; Bloodhound suggestion engine-->
+                        suggestion mechanism; Bloodhound suggestion engine.
+                        The dataset is 'bank' declared above.-->
                 <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                 <script src="../js/sugg.js" type = "text/javascript"></script>
                 
                 <!--The input form to take the query from user. Class is set
                         as so based on Twitter's typeahead.js-->
                 <form method = "post">
-                    <input type="text" name="search_bar" class ="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder = "Search...">
+                    <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search...">
                     
-                    <input type="image" src="../img/search-icon.png" class="search-btn" alt="Submit" >
+                    <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
                 </form>
                 
                 <!--Custom JavaScript enabling 'Enter' to search-->
@@ -68,7 +68,7 @@
                     $(".typeahead").keyup(function(event){
                         if(event.keyCode == 13)
                         {
-                            $(".search-btn").click();
+                            $(".search_btn").click();
                         }
                     });
                 </script>
@@ -83,14 +83,15 @@
                             
                 <?php
                     //Go to 'results.php' with query text in URL
-                    if (isset($_POST['search_bar']))
+                    if (isset($_POST['searchBar']))
                     {
                         $location = "Location: results.php?query=";
-                        $query = $_POST["search_bar"];
+                        $query = $_POST["searchBar"];
                         
                         $location .= $query;
 
                         header($location);
+                        exit; //Very important, otherwise multiple directs
                     }
                 ?>
                 

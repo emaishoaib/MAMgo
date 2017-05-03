@@ -46,7 +46,7 @@ body
         when #header was outside #background. Yet, px is used for height
         just to avoid compression when window resized
     */
-    height: 150px;      
+    height: 100px;      
     width: 100%;
     
 }
@@ -55,8 +55,7 @@ body
 {
     position: relative;     /*relative in heigth and width to parent (#header)*/
     top: 0%;
-    left: 14%;
-    right: 100%;
+    left: 0%;
     
     /*Careful! Making the height and width here percentages means that
         all the child with absolute (thus relative in position) will change their positions
@@ -74,7 +73,7 @@ body
 {    
     position: absolute;     /*absolute as in position relative to parent (#logo)*/
     top: 0%;
-    left: 0%;
+    left: 8%;
     margin: 0px;
     
     font-family: 'Fascinate';
@@ -95,7 +94,7 @@ body
     */
     position: absolute;     /*absolute as in position relative to parent (#logo)*/
     top: 42%;
-    left: 70%;
+    left: 78%;
     margin: 0px;
     
     font-family: 'Pacifico';
@@ -115,8 +114,8 @@ body
         there is no escaping the location of (#search) changing when window resizing except
         by setting top and left with fixed px amounts and not percentages
     */
-    top: 65%;
-    left: 14%;
+    top: 30px;
+    left: 250px;
     
     font-family: "Lato";
 }
@@ -127,9 +126,8 @@ body
         like position being set to relative - maybe it has to do
         with twitter's tyepahead.js, though doubtful*/
     
-    width: 30vw; 
+    width: 396px;
     padding: 12px 45px 12px 20px;
-    
     margin-bottom: 20px; 
     
     border: none;
@@ -196,17 +194,13 @@ body
 	/*margin: 0;*/
 }
 
-.search_btn
+.search-btn
 {
     /*icon image relative to '.typehead', because it's position
         is set relative*/
     position: absolute;
     top: 19%;
-    
-    /*Safe to use px even though responsive, because of absolute child and relative     parent. Infact, px better because we want search button to be fixed in
-        search bar*/
-    right: 12px;
-    
+    right: 3%;
     width: 20px;
     height: 20px;    
 }
@@ -217,7 +211,7 @@ body
     
     /*Don't want height to change with window resizing, thus px*/
     top: 0px;
-    padding-top: 0px;
+    padding-top: 10px;
     
     /* Commented out because width set to 100% instead of 500px;
     left: 50%;     /*Want the list to keep relocating as window resized, thus %* /
@@ -245,17 +239,14 @@ body
 
 .result_list
 {
-    position: relative;
     padding: 0px;
+}
+
+.result_record
+{
+    position: relative;
     left: 50%;
     transform: translate(-50%);
-    
-    /*
-        100% is entire width of page
-        16.5% is distance of search bar from left + some more
-        16.5% one more time for the right side
-    */
-    width: calc(100% - 16.5% - 16.5%);
     
     background-color: white;
     
@@ -263,28 +254,22 @@ body
     border-radius: 2px;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
     
-    padding: 10px 0px 10px 0px;
-}
-
-.result_record
-{
-    position: relative;
-    
     list-style: none;
     
-    /*Precentages for responsive web design*/
+    height: 100px;
+    width: 500px;
     
-    height: 15%;
-    
-    padding: 10px 20% 10px 4%;
-    margin: 0px 0px 1% 0px;
+    /*The following padding and margin are worth looking at 
+        in Chrome's inspect*/
+    padding: 10px 20px 10px 20px;
+    margin: 0px 0px 12px 0px;
 }
 
 .result_title
 {
     padding: 0px 0px 0px 0px;
-        
-    font-size: 18px;
+    
+    font-size: 20px;
     font-weight: bold;
 }
 
@@ -292,7 +277,7 @@ body
 {
     text-decoration: none;
     
-    color: mediumblue;
+    color: blue;
 }
 
 .result_title a:hover
@@ -334,7 +319,7 @@ body
     position: relative;
     top: 2%;
     
-    height: 150px;
+    height: 100px;
     width: 100%;
 }
     

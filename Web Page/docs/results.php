@@ -33,12 +33,12 @@
                 <!--Custom JavaScript for enabling color gradient change-->
                 <script src="../js/color-grad.js" type= "text/javascript"></script>
 
-                    <div id = "logo">
-                        <a href = "../index.php">
-                            <h1>MAM</h1>
-                            <h2>go</h2>
-                        </a>
-                    </div>
+                <div id = "logo">
+                    <a href = "../index.php">
+                        <h1>MAM</h1>
+                        <h2>go</h2>
+                    </a>
+                </div>
 
                 <div id = "search">
 
@@ -57,7 +57,8 @@
                     </script>
 
                     <!--Custom JavaScript based on Twitter's typeahead.js for 
-                            suggestion mechanism; Bloodhound suggestion engine-->
+                            suggestion mechanism; Bloodhound suggestion engine.
+                            The dataset is 'bank' declared above.-->
                     <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                     <script src="../js/sugg.js" type = "text/javascript"></script>
 
@@ -70,10 +71,10 @@
                     
                     <!--The input form to take the query from user. Class is set
                         as so based on Twitter's typeahead.js-->
-                    <form method = "post">
-                        <input type="text" name="search_bar" class ="typeahead tt-query" autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
+                    <form id="search_bar" method = "post">
+                        <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
 
-                        <input type="image" src="../img/search-icon.png" class="search-btn" alt="Submit">
+                        <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
                     </form>
 
                     <!--Custom JavaScript enabling 'Enter' to search-->
@@ -81,7 +82,7 @@
                         $(".typeahead").keyup(function(event){
                             if(event.keyCode == 13)
                             {
-                                $(".search-btn").click();
+                                $(".search_btn").click();
                             }
                         });
                     </script>
@@ -96,15 +97,24 @@
                     
                 <?php                               
                     //If search done, then reload page with new query in URL
-                    if (isset($_POST['search_bar']))
+                    if (isset($_POST['searchBar']))
                     {
                         $location = "Location: results.php?query=";
-                        $query = $_POST["search_bar"];
+                        $query = $_POST['searchBar'];
                         
                         $location .= $query;
 
-                        header($location);
+                        header($location); //Careful! Header function is slow
+                        exit; //Very important, otherwise multiple directs
                     }
+                               
+                    //Sending the query to Java for processing
+                    //send_query($query);
+                               
+                    //Receiving response from Java
+                    //$resp = receive_response();
+                               
+                    //echo $resp;
                 ?>
                     
                 </div>
@@ -163,7 +173,7 @@
                                         3- Get string with all terms
                                         4- Display string (truncating and bolding terms)
                                 -->
-                                Description unavailable!
+                                Description unavailable! sadasddfa adsflja asd;lfja al;dsjf as;lkdj a;slkdjf asdjf ad;slkjf als;kdjf ;lksjd f;lkasjdf ;lkasjdf ;lkasjdfl ;kajsdl; fjas
 
                             </li>
 
@@ -220,7 +230,11 @@
                 <script>
                     //Go to top of page when page link clicked (....)
                     $(".pagination").click(function() {
-                        $('#results').scrollTop(0);
+                        //If header scrolled as well
+                        $('#background').scrollTop(0);
+                        
+                        //If header not scrolled
+                        //$('#results').scrollTop(0);
                     });
                 </script>
                 
