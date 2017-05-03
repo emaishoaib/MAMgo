@@ -119,13 +119,12 @@ function send_query($query)
     //Closing the socket
     socket_close($socket);
     
-    /*Reading from socket was not done here because the PHP function
-        socket_read is a blocking function, meaning, everything stops
-        around it stops working until a time out happens or data is received.
-        Since the Java server side doesn't send any data till it reads,
-        and since socket_read would not let PHP to write, it is therefore
-        separated from the writing to socket part in PHP
-    */
+    /*Since the flush issue can't be solved here because keeping socket_read
+        here will leave entire function hanging, thus not sending the string
+        at first, and because writing socker_read in another function means
+        a problem with closing the socket (which would flush the buffer),
+        therefore the best solution was to make a socket for writing to Java
+        and a socket for reading from Java on two different ports respectively*/
 }
 
 // Receiving response from Java server
