@@ -24,10 +24,7 @@ function query_bank()
         array_push($bank, $row['query_count']);
         array_push($bank, $row['query_text']);
     }
-    
-    // Freeing $result to be able to perform another fetch throughout controller.php
-    //$result->close();
-            
+
     return $bank;
 }
 

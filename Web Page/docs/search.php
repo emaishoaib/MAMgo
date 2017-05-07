@@ -28,7 +28,8 @@
 
         <div id = "background">
             
-            <!--Custom JavaScript for enabling color gradient change-->
+            <!--Custom JavaScript for enabling color gradient change. Applied
+                    to selector (#logo h1) [check color-grad.js]-->
             <script src="../js/color-grad.js" type= "text/javascript"></script>
             
             <div id = "logo">
@@ -36,7 +37,6 @@
                     <h1>MAM</h1>
                     <h2>go</h2>
                 </a>
-                <p></p>
             </div>
             
             <div id = "search">
@@ -51,16 +51,20 @@
                 
                 <!--Custom JavaScript based on Twitter's typeahead.js for 
                         suggestion mechanism; Bloodhound suggestion engine.
-                        The dataset is 'bank' declared above.-->
+                        The dataset is 'bank' declared above, [check sugg.js]-->
                 <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                 <script src="../js/sugg.js" type = "text/javascript"></script>
                 
-                <!--The input form to take the query from user. Class is set
-                        as so based on Twitter's typeahead.js-->
+                <!--The input form to take the query from user-->
                 <form method = "post">
+                    
+                    <!--Class of text is set as so based on Twitter's typeahead.js-->
                     <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search...">
                     
+                    <!--alt="submit" makes the png icon like a submit button,
+                            submitting the form and thus setting the POST-->
                     <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
+                    
                 </form>
                 
                 <!--Custom JavaScript enabling 'Enter' to search-->
@@ -85,13 +89,20 @@
                     //Go to 'results.php' with query text in URL
                     if (isset($_POST['searchBar']))
                     {
+                        //Preparing the location to go to
                         $location = "Location: results.php?query=";
+                        
+                        //Getting the query from search bar
                         $query = $_POST["searchBar"];
                         
+                        //Concatenating query to location
                         $location .= $query;
 
+                        //Go to location
                         header($location);
-                        exit; //Very important, otherwise multiple directs
+                        
+                        //To avoid multiple directs
+                        exit;
                     }
                 ?>
                 

@@ -82,20 +82,6 @@ body
     color: dimgray;
 }
 
-#logo p
-{
-    position: fixed;
-    top: 48%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0px;
-    
-    font-family: 'Lato';
-    font-size: 100%;
-    
-    color: black;
-}
-
 #search
 {
     font-family: "Lato";
@@ -192,6 +178,7 @@ body
     /*icon image relative to '.typehead', because it's position
         is set relative*/
     position: absolute;
+    
     top: 19%;
     right: 3%;
     width: 20px;

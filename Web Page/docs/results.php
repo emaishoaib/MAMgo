@@ -30,7 +30,8 @@
             
             <div id = "header">
            
-                <!--Custom JavaScript for enabling color gradient change-->
+                <!--Custom JavaScript for enabling color gradient change. Applied
+                    to selector (#logo h1) [check color-grad.js]-->
                 <script src="../js/color-grad.js" type= "text/javascript"></script>
 
                 <div id = "logo">
@@ -43,11 +44,11 @@
                 <div id = "search">
 
                     <?php
-                        //Update query list in DB
+                        //Update query list in DB, if parameter 'query' (GET) is set
                         if (isset($_GET['query']))
                             add_query();
                     
-                        //PHP for getting data set of all queries entered by users
+                        //PHP for getting all queries entered by users
                         $bank = query_bank();
                     ?>
                     
@@ -58,11 +59,12 @@
 
                     <!--Custom JavaScript based on Twitter's typeahead.js for 
                             suggestion mechanism; Bloodhound suggestion engine.
-                            The dataset is 'bank' declared above.-->
+                            The dataset is 'bank' declared above. [check sugg.js]-->
                     <script src="../js/typeahead.bundle.js" type="text/javascript"></script> 
                     <script src="../js/sugg.js" type = "text/javascript"></script>
 
                     <?php
+                        //If the 'query' paramter is set in URL, store its value in $query
                         if (isset($_GET['query']))
                         {
                             $query = $_GET['query'];
@@ -72,9 +74,16 @@
                     <!--The input form to take the query from user. Class is set
                         as so based on Twitter's typeahead.js-->
                     <form id="search_bar" method = "post">
-                        <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
+                        
+                        <!--Class of text is set as so based on Twitter's typeahead.js. Value is set
+                                as so in order to display $query-->
+                        <input type="text" class ="typeahead tt-query" name="searchBar" 
+                               autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
 
+                        <!--alt="submit" makes the png icon like a submit button,
+                            submitting the form and thus setting the POST-->
                         <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
+                        
                     </form>
 
                     <!--Custom JavaScript enabling 'Enter' to search-->
@@ -99,13 +108,20 @@
                     //If search done, then reload page with new query in URL
                     if (isset($_POST['searchBar']))
                     {
+                        //Preparing the location to go to
                         $location = "Location: results.php?query=";
+                        
+                        //Getting the query from search bar
                         $query = $_POST['searchBar'];
                         
+                        //Concatenating query to location
                         $location .= $query;
 
-                        header($location); //Careful! Header function is slow
-                        exit; //Very important, otherwise multiple directs
+                        //Header function may be slow
+                        header($location);
+                        
+                        //To avoid multiple directs
+                        exit;
                     }
                                
                     //Sending the query to Java for processing
@@ -128,6 +144,7 @@
                     //Getting the results
                     $result_records = get_results();
                     
+                    //If no results found, then...
                     if (mysqli_num_rows($result_records) == 0)
                     {
                 ?>
@@ -137,13 +154,18 @@
                 
                 <?php
                     }
+                
+                    //If results found, then...
                     else
                     {
                 ?>
                 
+                <!--Main unordered list that will be paginated-->
                 <ul class = "result_list">
                 
                 <?php
+                        /*Iterate over each result record, and for each operate
+                            on the value of $row*/
                         while ($row = $result_records->fetch_assoc())
                         {
                 ?>
@@ -152,19 +174,25 @@
                             till all rows of 'results' view are retrieved.-->
                     <ul class = "result_record">
                         
+                        <!--Each result record has a record title, which is a clickable link
+                                that directs to current row's docLink column in DB, with display 
+                                value of current row's docTitle column in DB-->
                         <li class = "result_title">
                             <a href = "<?php echo $row['docLink']?>">
                                 <?php echo $row['docTitle']?>
                             </a>
                         </li>
 
+                        <!--The details of each result record-->
                         <ul class = "result_details">
 
+                            <!--Each result link just has a display value of current
+                                    row's docLink column in DB-->
                             <li class = "result_link">
                                 <?php echo $row['docLink']?>
                             </li>
 
-
+                            <!--Each result description is...-->
                             <li class = "result_description">
 
                                 <!--The following needs to be done
@@ -173,8 +201,7 @@
                                         3- Get string with all terms
                                         4- Display string (truncating and bolding terms)
                                 -->
-                                Description unavailable! sadasddfa adsflja asd;lfja al;dsjf as;lkdj a;slkdjf asdjf ad;slkjf als;kdjf ;lksjd f;lkasjdf ;lkasjdf ;lkasjdfl ;kajsdl; fjas
-
+                                Description unavailable!
                             </li>
 
                         </ul>
@@ -192,9 +219,11 @@
                 ?>
                 
                 <div id="pages">
+                    
                     <!--List of numbers for paginating, with each number being a
                             link controlled by the script that follows-->
                     <ul class="pagination">
+                        
                         <!--1, 2, 3...... will come here based on the script
                                 that follows-->
                     </ul>
@@ -203,17 +232,18 @@
                 <!--Custom JavaScript for pagination using List.js-->
                 <script src="../js/list.js"></script>
                 
+                <!--Utilizing List.js-->
                 <script>
                     var options = {
                         
-                        //The class of the list containe. This is what
-                        //  contains all the items (list) to be pagianted
+                        /*The class of the list containe. This is what
+                            contains all the items (list) to be pagianted*/
                         listClass: "result_list",
                         
-                        //The class of each list item; this class is within
-                        //  the class of the list container. This is what
-                        //  repeates itself many times, and is thus each
-                        //  list item of the pagination
+                        /*The class of each list item; this class is within
+                            the class of the list container. This is what
+                            repeates itself many times, and is thus each
+                            list item of the pagination*/
                         valueNames: ['result_record'],
                         
                         //Numebr of list items per page
@@ -227,21 +257,23 @@
                     var searchList = new List('results', options);
                 </script>
                 
+                <!--Script for going to top of page when page link is clicked-->
                 <script>
-                    //Go to top of page when page link clicked (....)
+                    //(.pagination) is the selector to be clicked by user (page link)
                     $(".pagination").click(function() {
-                        //If header scrolled as well
+                        
+                        /*(#background) is the destination, going to its top.
+                                Use when header is not scrolled along*/
                         $('#background').scrollTop(0);
                         
-                        //If header not scrolled
+                        /*(#results) is the destination, going to its top.
+                                Use when header is scrolled along*/
                         //$('#results').scrollTop(0);
                     });
                 </script>
                 
-            <!--(#results) div-->
             </div>
             
-        <!--(#background) div-->
         </div>
         
     </body>
