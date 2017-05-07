@@ -105,7 +105,7 @@
                     </script>
                     
                 <?php                               
-                    //If search done, then reload page with new query in URL
+                    //If search done, then reload page with new query of searchBar in URL
                     if (isset($_POST['searchBar']))
                     {
                         //Preparing the location to go to

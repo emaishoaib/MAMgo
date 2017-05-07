@@ -33,7 +33,7 @@
             <script src="../js/color-grad.js" type= "text/javascript"></script>
             
             <div id = "logo">
-                <a href = "index.php">
+                <a href = "../index.php">
                     <h1>MAM</h1>
                     <h2>go</h2>
                 </a>
