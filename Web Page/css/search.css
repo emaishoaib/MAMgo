@@ -14,18 +14,14 @@ body
 #background
 {
     position: fixed;
+    background: url("../img/playstation-pattern.png");
+    animation: 200s scroll infinite linear;
     top: 0;
     left: 0;
-    
     width: 100%;
     height: 100%;
-    
-    /* Enabling the background scrolling animation */
-    background: url("../img/playstation-pattern.png");
-    animation: 200s scroll infinite linear;  
 }
 
-/* Part of the background scrolling animation */
 @keyframes scroll
 {
   100%
@@ -36,11 +32,12 @@ body
 
 #logo
 {
-    position: relative;    
+    position: relative;     /*to make the childs relative to it*/
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     
+    /*dimenstions important for positioning of childs relative to parent*/
     height: 500px;
     width: 500px;
     
@@ -51,21 +48,18 @@ body
 
 #logo h1
 {
-    position: absolute;         
+    /*!important is for disabling javascript from overriding*/
+    
+    position: absolute;     /*absolute as in position relative to parent (#logo)*/
     top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
-    
     margin: 0px;
     
     font-family: 'Fascinate';
     font-size: 1000%;
     font-weight: normal;
     
-    /* color-grad.js changes the background attribute here */
-    
-    /* !important is for disabling javascript from overriding */
-    /* masking or clipping the background to only the text */
     -webkit-background-clip: text !important;
     color: transparent;
     
@@ -75,11 +69,10 @@ body
 
 #logo h2
 {
-    position: absolute;         
+    position: absolute;     /*absolute as in position relative to parent (#logo)*/
     top: 39%;
     right: 2%;
     transform: translate(-50%, -50%);
-    
     margin: 0px;
     
     font-family: 'Pacifico';
@@ -91,20 +84,28 @@ body
 
 #search
 {
+    font-family: "Lato";
     position: fixed;
     top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
-    
-    font-family: "Lato";
 }
 
 .typeahead, .tt-query, .tt-hint 
 {    
-    /* reset.css should have been used from the start to avoid many things being set automatically */
+    /*Somehow there are so many things atuomatically set
+        like position being set to relative - maybe it has to do
+        with twitter's tyepahead.js, though doubtful*/
+    
+    /*This could be the reason why reset.css was needed, and why if we
+        add it now, so many things go wrong, because quite simply, all
+        this CSS written so far does not handle the things alread handled
+        before applying reset.css, which zeros them upon applying. This also
+        explains why there are things with margin out of nowhere till we
+        remove the margins manually
+    */
     
     width: 396px;
-    
     padding: 12px 45px 12px 20px;
     margin-bottom: 20px; 
     
@@ -138,34 +139,31 @@ body
 
 .tt-menu 
 {  
-    width: 99%;
-
-    padding: 0px 0px 0px 0px;
-    margin-top: -1px; 
-
     border: 1px solid #ddd;
+    margin-top: -1px; 
     background-color: #f6f6f6; 
+    
+    padding: 0px 0px 0px 0px;
+    width: 99%;
 }
 
 .tt-suggestion 
 {
-    padding: 13px;
-    
+    padding: 13px; 
     text-decoration: none;
     font-size: 16px; 
     color: black; 
 }
 
-/* For mouse hover in suggestion */
-.tt-suggestion:hover    
+
+.tt-suggestion:hover    /*For mouse hover in suggestion*/
 {
     cursor: pointer;
     background-color: #EEEEEE;
     color: #000000;
 }
 
-/* For arrows keys in suggestion */
-.tt-cursor      
+.tt-cursor      /*For arrows keys in suggestion*/
 {
     background-color: #EEEEEE;
 }
@@ -177,10 +175,12 @@ body
 
 .search_btn
 {
+    /*icon image relative to '.typehead', because it's position
+        is set relative*/
     position: absolute;
+    
     top: 19%;
     right: 3%;
-    
     width: 20px;
     height: 20px;    
 }
