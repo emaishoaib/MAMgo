@@ -93,7 +93,7 @@ public class QP {
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("create view result as select a.docID, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -104,7 +104,7 @@ public class QP {
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
 
 				//Remove stopwords
-				for(int i = 0; i < stopwords.length; i++)
+				/*for(int i = 0; i < stopwords.length; i++)
 				{
 					for(int j = 0; j < words.size(); j++)
 					{
@@ -113,7 +113,7 @@ public class QP {
 							words.remove(j);
 						}
 					}
-				}
+				}*/
 
 				if(words.size() == 0)
 				{
@@ -207,11 +207,11 @@ public class QP {
 				{
 					System.out.println("One word");
 
-					sqlST = "create view result as select a.docID, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + " union select a.docID, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+						sqlST = sqlST + " union select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 					}
 
 					sqlST = sqlST + " order by docID";
