@@ -32,7 +32,7 @@ public class QueryProcessor
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			Connection con = DriverManager.getConnection(url, user, password);
 
-			java.sql.PreparedStatement dv = con.prepareStatement("drop view if exists result");
+			java.sql.PreparedStatement dv = con.prepareStatement("drop view if exists results_view");
 			dv.execute();
 			java.sql.PreparedStatement ps;
 
@@ -49,7 +49,7 @@ public class QueryProcessor
 				{
 					System.out.println("More than one word PS");
 
-					sqlST = "create view result as select distinct * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -95,7 +95,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("create view result as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -105,23 +105,10 @@ public class QueryProcessor
 			{
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
 
-				if(words.size() == 0)
-				{
-					singleSW = true;
-					return false;
-				}
-
 				//Add stems to array
 				PorterStemmer stemmer = new PorterStemmer();
 				String stemmed;
-				for(int i = 0; i < words.size(); i++)
-				{
-					stemmer.setCurrent(words.get(i));
-					stemmer.stem();
-					stemmed = stemmer.getCurrent();
-					if(!words.get(i).equals(stemmed))
-						stems.add(stemmed);
-				}
+				
 				
 				wordsST = new ArrayList<String>(words);
 				String sqlST = "";
@@ -150,7 +137,14 @@ public class QueryProcessor
 						}
 						
 						if(KeepStopWords)
+						{
 							AllStopWords = false;
+							stemmer.setCurrent(words.get(i));
+							stemmer.stem();
+							stemmed = stemmer.getCurrent();
+							if(!words.get(i).equals(stemmed))
+							stems.add(stemmed);			
+						}
 					}
 					
 					if(AllStopWords)
@@ -158,7 +152,7 @@ public class QueryProcessor
 						words = new ArrayList<String>(wordsST);
 					}
 
-					sqlST = "create view result as select distinct * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -226,8 +220,25 @@ public class QueryProcessor
 				else
 				{
 					System.out.println("One word");
+					
+					for(int i = 0; i < stopwords.length; i++)
+					{
+						if(words.get(0).equals(stopwords[i]))
+						{
+							AllStopWords = false;
+						}
+					}
+					
+					if(AllStopWords)
+					{
+						stemmer.setCurrent(words.get(0));
+						stemmer.stem();
+						stemmed = stemmer.getCurrent();
+						if(!words.get(0).equals(stemmed))
+						stems.add(stemmed);	
+					}
 
-					sqlST = "create view result as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
