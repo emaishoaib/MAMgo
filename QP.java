@@ -104,7 +104,7 @@ public class QP {
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
 
 				//Remove stopwords
-				for(int i = 0; i < stopwords.length; i++)
+				/*for(int i = 0; i < stopwords.length; i++)
 				{
 					for(int j = 0; j < words.size(); j++)
 					{
@@ -113,7 +113,7 @@ public class QP {
 							words.remove(j);
 						}
 					}
-				}
+				}*/
 
 				if(words.size() == 0)
 				{
