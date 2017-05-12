@@ -22,19 +22,20 @@ public class QueryProcessor
 		singleSW = false;
 		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
-		String password = "";
+		String password = "11147878";
 		ArrayList<String> words;
+		ArrayList<String> wordsST;
 		ArrayList<String> stems = new ArrayList<String>();
-		
+
 		//Connecting to the database
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			Connection con = DriverManager.getConnection(url, user, password);
 
-			java.sql.PreparedStatement dv = con.prepareStatement("drop view if exists results_view");
+			java.sql.PreparedStatement dv = con.prepareStatement("drop view if exists result");
 			dv.execute();
 			java.sql.PreparedStatement ps;
-			
+
 			if(query.startsWith("\"") && query.endsWith("\""))
 			{
 				//Phrase searching
@@ -48,7 +49,7 @@ public class QueryProcessor
 				{
 					System.out.println("More than one word PS");
 
-					sqlST = "create view results_view as select * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view result as select * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -94,7 +95,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("create view results_view as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -103,18 +104,6 @@ public class QueryProcessor
 			else
 			{
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
-
-				//Remove stopwords
-//				for(int i = 0; i < stopwords.length; i++)
-//				{
-//					for(int j = 0; j < words.size(); j++)
-//					{
-//						if(words.get(j).equals(stopwords[i]))
-//						{
-//							words.remove(j);
-//						}
-//					}
-//				}
 
 				if(words.size() == 0)
 				{
@@ -133,13 +122,43 @@ public class QueryProcessor
 					if(!words.get(i).equals(stemmed))
 						stems.add(stemmed);
 				}
-
+				
+				wordsST = new ArrayList<String>(words);
 				String sqlST = "";
+				boolean KeepStopWords = true;
+				boolean AllStopWords = true;
+				
 				if(words.size() > 1)
 				{
 					System.out.println("More than one word");
+					
+					//Remove stopwords
+					
+					for(int i = 0; i < words.size(); i++)
+					{
+						KeepStopWords = true;
+						
+						for(int j = 0; j < stopwords.length; j++)
+						{
+							if(words.get(i).equals(stopwords[j]))
+							{
+								words.remove(i);
+								i--;
+								KeepStopWords = false;
+								break;
+							}
+						}
+						
+						if(KeepStopWords)
+							AllStopWords = false;
+					}
+					
+					if(AllStopWords)
+					{
+						words = new ArrayList<String>(wordsST);
+					}
 
-					sqlST = "create view results_view as select * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view result as select * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -208,7 +227,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word");
 
-					sqlST = "create view results_view as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
@@ -230,7 +249,7 @@ public class QueryProcessor
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 	
