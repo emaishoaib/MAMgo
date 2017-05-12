@@ -49,7 +49,7 @@ public class QueryProcessor
 				{
 					System.out.println("More than one word PS");
 
-					sqlST = "create view result as select * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view result as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -95,7 +95,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view result as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -158,7 +158,7 @@ public class QueryProcessor
 						words = new ArrayList<String>(wordsST);
 					}
 
-					sqlST = "create view result as select * from doc_links where docID in (select a0.docID from ";
+					sqlST = "create view result as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -183,7 +183,7 @@ public class QueryProcessor
 
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + "union select * from doc_links where docID in (select a0.docID from ";
+						sqlST = sqlST + "union select distinct * from doc_links where docID in (select a0.docID from ";
 
 						for(int i = 0; i < stems.size() - 1; i++)
 						{
@@ -227,11 +227,11 @@ public class QueryProcessor
 				{
 					System.out.println("One word");
 
-					sqlST = "create view result as select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view result as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + " union select a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+						sqlST = sqlST + " union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 					}
 
 					sqlST = sqlST + " order by docID";
