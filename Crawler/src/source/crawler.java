@@ -30,9 +30,9 @@ import source.SimpleRobotRules.RobotRulesMode;
 @SuppressWarnings("unused")
 public class crawler implements Runnable
 {
-	static private String state_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\state.txt";
-	static private String links_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\links.txt";
-	static private String htmls_folder = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\HTMLs\\";
+	static private String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\state.txt";
+	static private String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\links.txt";
+	static private String htmls_folder = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\HTMLs\\";
 	
 	private int threads;
 	private int maxDepth;

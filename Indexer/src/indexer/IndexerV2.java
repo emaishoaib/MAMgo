@@ -34,9 +34,9 @@ public class IndexerV2
 	
 	public static void main(String[] args) 
 	{	
-		String state_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\state.txt";
-		String links_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\links.txt";
-		String htmls_folder = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\HTMLs\\";
+		String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\state.txt";
+		String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\links.txt";
+		String htmls_folder = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\HTMLs\\";
 		
 		String url = "jdbc:mysql://localhost:3306/";
 		String user = "root";
