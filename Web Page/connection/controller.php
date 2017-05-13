@@ -137,7 +137,7 @@ function get_snippet($id, $query)
     $snippet = "";
     
     // Storing the directory of the HTML doc as a string in variable $html_dir
-    $html_dir = "../_crawled/$id.html";
+    $html_dir = "../_crawler/HTMLs/$id.html";
     
     // Extracting the HTML code as an object from HTML document in multiple variables, each whose name indicate what HTML code is there
     $html_code_all = file_get_html($html_dir);

@@ -22,7 +22,7 @@ public class QueryProcessor
 		singleSW = false;
 		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
-		String password = "11147878";
+		String password = "";
 		ArrayList<String> words;
 		ArrayList<String> wordsST;
 		ArrayList<String> stems = new ArrayList<String>();
