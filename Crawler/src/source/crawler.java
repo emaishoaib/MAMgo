@@ -30,6 +30,10 @@ import source.SimpleRobotRules.RobotRulesMode;
 @SuppressWarnings("unused")
 public class crawler implements Runnable
 {
+	static private String state_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\state.txt";
+	static private String links_txt = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\links.txt";
+	static private String htmls_folder = "C:\\Users\\emais\\Documents\\GitHub\\APT-Project\\Web Page\\_crawler\\HTMLs\\";
+	
 	private int threads;
 	private int maxDepth;
 	private Set<String> visited;
@@ -94,7 +98,7 @@ public class crawler implements Runnable
 	{
 		state = State;
 		
-		try(BufferedWriter file = new BufferedWriter(new FileWriter("D:\\links.txt", false))) {
+		try(BufferedWriter file = new BufferedWriter(new FileWriter(links_txt, false))) {
 			
 			for(String urls : visited)
 			{
@@ -110,7 +114,7 @@ public class crawler implements Runnable
 			e.printStackTrace();
 		}
 		
-		try(BufferedWriter file = new BufferedWriter(new FileWriter("D:\\state.txt", false))) {
+		try(BufferedWriter file = new BufferedWriter(new FileWriter(state_txt, false))) {
 
 			file.write(String.valueOf(state));
 
@@ -224,7 +228,7 @@ public class crawler implements Runnable
 				
 				links = doc.select("a[href]");
 				
-				try(BufferedWriter file = new BufferedWriter(new FileWriter("D:\\HTMLs\\" + state + ".html"))) {
+				try(BufferedWriter file = new BufferedWriter(new FileWriter(htmls_folder + state + ".html"))) {
 
 					file.write(doc.toString());
 
@@ -285,7 +289,7 @@ public class crawler implements Runnable
 		int state = 0;
 		int nt = 1;
 		
-		try(BufferedReader file = new BufferedReader(new FileReader("D:\\state.txt")))
+		try(BufferedReader file = new BufferedReader(new FileReader(state_txt)))
 		{
 			state = Integer.parseInt(file.readLine());
 
@@ -294,7 +298,7 @@ public class crawler implements Runnable
 			e.printStackTrace();
 		}
 		
-		try(BufferedReader file = new BufferedReader(new FileReader("D:\\links.txt")))
+		try(BufferedReader file = new BufferedReader(new FileReader(links_txt)))
 		{
 			int i = 0;
 			
