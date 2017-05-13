@@ -108,7 +108,7 @@
                         $query = $_POST['searchBar'];
                         
                         // Concatenating query to location
-                        $location .= $query;
+                        $location = $location . $query;
 
                         // Header function may be slow
                         header($location);
@@ -116,14 +116,25 @@
                         // To avoid multiple directs
                         exit;
                     }
+                     
+                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test
+                    if (isset($_GET['test']))
+                    {
+                        // test_ui() is defined in 'controller.php'
+                        test_ui();
+                    }
                                
-                    // Sending the query to Java for processing
-                    //send_query($query);
+                    // If there is no 'test' parameter, then actual search
+                    else
+                    {
+                        // Sending the query to Java for processing
+                        send_query($query);
                                
-                    // Receiving response from Java
-                    //$resp = receive_response();
+                        // Receiving response from Java
+                        $resp = receive_response();
                                
-                    //echo $resp;
+                        //echo $resp;
+                    }
                 ?>
                     
                 </div>
@@ -190,7 +201,7 @@
                                     $snippet = get_snippet($row['docID'], $_GET['query']);
                                                                 
                                     // Echoing the description snippet
-                                    echo $snippet
+                                    echo $snippet;
                                 ?>
                                 
                             </li>

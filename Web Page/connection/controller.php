@@ -6,9 +6,6 @@ include ('../connection/db_handler.php');
 // 'simple_html_dom.php' is a cusom php files, containing functions for parsing HTML
 include ('../funcs/simple_html_dom.php');
 
-// List of stopwords
-$stopwords = array ("a", "as", "able", "about", "above", "according", "accordingly", "across", "actually", "after", "afterwards", "again", "against", "aint", "all", "allow", "allows", "almost", "alone", "along", "already", "also", "although", "always", "am", "among", "amongst", "an", "and", "another", "any", "anybody", "anyhow", "anyone", "anything", "anyway", "anyways", "anywhere", "apart", "appear", "appreciate", "appropriate", "are", "arent", "around", "as", "aside", "ask", "asking", "associated", "at", "available", "away", "awfully", "be", "became", "because", "become", "becomes", "becoming", "been", "before", "beforehand", "behind", "being", "believe", "below", "beside", "besides", "best", "better", "between", "beyond", "both", "brief", "but", "by", "cmon", "cs", "came", "can", "cant", "cannot", "cant", "cause", "causes", "certain", "certainly", "changes", "clearly", "co", "com", "come", "comes", "concerning", "consequently", "consider", "considering", "contain", "containing", "contains", "corresponding", "could", "couldnt", "course", "currently", "definitely", "described", "despite", "did", "didnt", "different", "do", "does", "doesnt", "doing", "dont", "done", "down", "downwards", "during", "each", "edu", "eg", "eight", "either", "else", "elsewhere", "enough", "entirely", "especially", "et", "etc", "even", "ever", "every", "everybody", "everyone", "everything", "everywhere", "ex", "exactly", "example", "except", "far", "few", "ff", "fifth", "first", "five", "followed", "following", "follows", "for", "former", "formerly", "forth", "four", "from", "further", "furthermore", "get", "gets", "getting", "given", "gives", "go", "goes", "going", "gone", "got", "gotten", "greetings", "had", "hadnt", "happens", "hardly", "has", "hasnt", "have", "havent", "having", "he", "hes", "hello", "help", "hence", "her", "here", "heres", "hereafter", "hereby", "herein", "hereupon", "hers", "herself", "hi", "him", "himself", "his", "hither", "hopefully", "how", "howbeit", "however", "i", "id", "ill", "im", "ive", "ie", "if", "ignored", "immediate", "in", "inasmuch", "inc", "indeed", "indicate", "indicated", "indicates", "inner", "insofar", "instead", "into", "inward", "is", "isnt", "it", "itd", "itll", "its", "its", "itself", "just", "keep", "keeps", "kept", "know", "knows", "known", "last", "lately", "later", "latter", "latterly", "least", "less", "lest", "let", "lets", "like", "liked", "likely", "little", "look", "looking", "looks", "ltd", "mainly", "many", "may", "maybe", "me", "mean", "meanwhile", "merely", "might", "more", "moreover", "most", "mostly", "much", "must", "my", "myself", "name", "namely", "nd", "near", "nearly", "necessary", "need", "needs", "neither", "never", "nevertheless", "new", "next", "nine", "no", "nobody", "non", "none", "noone", "nor", "normally", "not", "nothing", "novel", "now", "nowhere", "obviously", "of", "off", "often", "oh", "ok", "okay", "old", "on", "once", "one", "ones", "only", "onto", "or", "other", "others", "otherwise", "ought", "our", "ours", "ourselves", "out", "outside", "over", "overall", "own", "particular", "particularly", "per", "perhaps", "placed", "please", "plus", "possible", "presumably", "probably", "provides", "que", "quite", "qv", "rather", "rd", "re", "really", "reasonably", "regarding", "regardless", "regards", "relatively", "respectively", "right", "said", "same", "saw", "say", "saying", "says", "second", "secondly", "see", "seeing", "seem", "seemed", "seeming", "seems", "seen", "self", "selves", "sensible", "sent", "serious", "seriously", "seven", "several", "shall", "she", "should", "shouldnt", "since", "six", "so", "some", "somebody", "somehow", "someone", "something", "sometime", "sometimes", "somewhat", "somewhere", "soon", "sorry", "specified", "specify", "specifying", "still", "sub", "such", "sup", "sure", "ts", "take", "taken", "tell", "tends", "th", "than", "thank", "thanks", "thanx", "that", "thats", "thats", "the", "their", "theirs", "them", "themselves", "then", "thence", "there", "theres", "thereafter", "thereby", "therefore", "therein", "theres", "thereupon", "these", "they", "theyd", "theyll", "theyre", "theyve", "think", "third", "this", "thorough", "thoroughly", "those", "though", "three", "through", "throughout", "thru", "thus", "to", "together", "too", "took", "toward", "towards", "tried", "tries", "truly", "try", "trying", "twice", "two", "un", "under", "unfortunately", "unless", "unlikely", "until", "unto", "up", "upon", "us", "use", "used", "useful", "uses", "using", "usually", "value", "various", "very", "via", "viz", "vs", "want", "wants", "was", "wasnt", "way", "we", "wed", "well", "were", "weve", "welcome", "well", "went", "were", "werent", "what", "whats", "whatever", "when", "whence", "whenever", "where", "wheres", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which", "while", "whither", "who", "whos", "whoever", "whole", "whom", "whose", "why", "will", "willing", "wish", "with", "within", "without", "wont", "wonder", "would", "would", "wouldnt", "yes", "yet", "you", "youd", "youll", "youre", "youve", "your", "yours", "yourself", "yourselves", "zero");
-
 // Function to retrieve all queries entered by users in a dataset of type array
 function query_bank()
 {
@@ -38,6 +35,25 @@ function query_bank()
 
     // Return the array $bank
     return $bank;
+}
+
+// Function to test the interface by changing/adding the VIEW 'results_view' to a desired form
+function test_ui()
+{
+    // $connection is defined in 'db_handler.php'
+    global $connection;
+    
+    // The SQL query to execute in the database to drop the VIEW 'results_view'
+    $sql = "DROP VIEW results_view IF EXISTS";
+    
+    // Executing the query
+    $connection->query($sql);
+    
+    // The SQL query to create VIEW 'results_view' with all the docs (desired form)
+    $sql = "CREATE VIEW results_view AS SELECT * FROM doc_links";
+    
+    // Executing the query
+    $connection->query($sql);
 }
 
 // Function to add the query to the database, and if existent, then just update count
@@ -89,7 +105,7 @@ function add_query()
     
 }
 
-// Getting the search results as outputted by query processor from 'results' view
+// Getting the search results as outputted by query processor from VIEW 'results_view'
 function get_results()
 {
     // $connection is defined in 'db_handler.php'
@@ -117,36 +133,165 @@ function get_snippet($id, $query)
     
     //$result = "<b>Doc ID:</b> $id <br>";
     
-    // Removing stop words from query entered by user
-    //$query_no_stop = preg_replace("\b$stopwords\b", "", $query);
+    // Variable to store the description snippet
+    $snippet = "";
     
     // Storing the directory of the HTML doc as a string in variable $html_dir
     $html_dir = "../_crawled/$id.html";
     
-    // Extracting the HTML code from HTML document
-    $html_code = file_get_html($html_dir);
+    // Extracting the HTML code as an object from HTML document in multiple variables, each whose name indicate what HTML code is there
+    $html_code_all = file_get_html($html_dir);
+    $html_code_no_title = file_get_html($html_dir);
     
-    // For each term in the tokenized string array query, without stopwords, search for it in the order
-    //  of let's say <p> then <ul> then <table> and such. As soon as found, store the string
+    // Removing the desired tags from HTML code object. The HTML code object is passed by reference
+    remove_tag($html_code_no_title, 'title');
     
-    // Search in that same string for the other word, if there, just highlight it as well, if not
-    // then research using the same way
+    // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object
+    $head_no_title = $html_code_no_title->find('head');
+    $body_no_title = $html_code_no_title->find('body');
     
-    // Keep doing so for the remaning terms
+    //echo $html_code_no_title->plaintext;
     
-    // Finally, if after searcing for all terms you end up with one string, then it is the snippet, just
-    //  truncate it to a certain number of words if it goes beyond a certain number with ... at beginning and/or end
+    // If $query is just a single word
+    if (str_word_count($query) == 1)
+    {
+        // For each tag number object in the tag type's array $body_no_title
+        foreach ($body_no_title as $tag_num)
+        {
+            // Plaintext of the current tag number
+            $text = $tag_num->plaintext;
+
+            // Splitting text into string array on space
+            $text_arr = preg_split("/[\s]+/", $text);
+            
+            // If the query word is in that tag number (stripos() not strpos() as former is case insensitive)
+            if (stripos($text, $query) == TRUE)
+            {
+                // Getting the first occurence of $query in the string, using 'true' to get all that precedes it (excluding occurence)
+                $preceding = strstr($text, $query, true);
+                
+                // Getting the count of words preceting $query in the string 
+                $count_preceding = str_word_count($preceding);
+                
+                // Getting the first occurence of $query in the string, using 'false' to get all that follows it (including occurence)
+                $following = strstr($text, $query, false);
+                
+                // Getting the count of words following $query in the string
+                $count_following = str_word_count($following);
+                
+                // Storing the position of $query in the string
+                $position = $count_preceding + 1;
+                             
+                // Getting $query in the string
+                $snippet = " " . $query . " ";
+                
+                // Getting 'n' words before $query in the string, concatenating it to $snippet
+                $snippet = get_n_preceding($text_arr, $position, 20) . $snippet;
+                
+                // Getting 'n' words after $query in the string, concatenating it to $snippet
+                $snippet = $snippet . get_n_following($text_arr, $position, 20);
+                
+                // Replacing the $query occurence with itself surrounded by bold tags (regex)
+                $snippet = preg_replace("/$query/i", "<b>\$0</b>", $snippet);
+            }
+        }
+    }
     
-    // If you ended up with multiple strings, then truncate them, placing ... in between and add them together
+    // If $query is multiple words, and without quotations
+    if (strlen($query) > 1 && strpos($query, '"') == FALSE)
+    {
+    }
     
+    // If $query is multiple words, and with quotations
+    if (strlen($query) > 1 && strpos($query, '"') == TRUE)
+    {
+    }
+
     // Extracting the <p> tag
-    $title = $html_code->find('p', 0);
+    //$title = $html_code_all->find('title', 0);
     
     // Getting the plaintext of the tag
-    $result = $title->plaintext;
-    
+    //$result = $title->plaintext;
+
     // Return the string with the terms of the query entered by the user
-    return $result;
+    return $snippet;
+}
+
+// Function to remove the desired tag from HTML code object. '&' is used to pass the HTML code object by reference
+function remove_tag(&$html_obj, $tag)
+{
+    // Filtering the desired tags associated with HTML code object, which would be stored in an array, each tag number occupying a slot in the array, stored as an object. NOTE, the find() operation acts like a filter as to what tags of the HTML code object will be visible, therefore, any change done to those found tags will directly affect the original HTML code object, because they are the both referencing the same thing - we merely just showed a filter of what's there
+    $tag_type = $html_obj->find($tag);
+    
+    // Iterating over all the <title> tags
+    foreach ($tag_type as $tag_info)
+    {
+        // Setting the outertext i.e. the tag itself to nothing
+        $tag_info->outertext = '';
+        
+        // Setting the innertext i.e. the text of the tag itself to nothing. This is actually the plaintext of the tag but with HTML, thus innertext is used because we want to also remove tags that are acting as plaintext e.g. <title>Hello <b>World!</b></title> - plaintext is 'Hello World!' but innertext is 'Hello <b>World!</b>'
+        $tag_info->innertext = '';    
+    }
+    
+    // Alternative to setting the innertext to nothing is to the following,
+    // ...saving
+    //$save_state = $html_code_no_title->save();
+    // ...and reloading
+    //$html_code_no_title->load($save_state); 
+}
+
+// Function to get 'n' words before the current index, as a string
+function get_n_preceding($arr, $index, $num)
+{
+    $string = "";
+
+    // Getting 'n' words before current index
+    for ($i = $index - 1; $i >= 0; $i--)
+    {
+        // Concatenate to the back
+        $string = $arr[$i] . $string;
+        $string = " " . $string;
+                    
+        // If 'n' words, then break (-1 to compensate starting index = 0)
+        if ($index - $i == $num - 1)
+        {
+            // If start not reached, add '...'
+            if ($i != 0)
+                $string = "..." . $string;
+            
+            break;
+        }
+    }
+    
+    // Returning the 'n' words (string)
+    return $string;
+}  
+
+// Function to get 'n' words after the current index, as a string
+function get_n_following($arr, $index, $num)
+{
+    $string = "";
+    
+    // Getting 'n' words after the current index
+    for ($i = $index + 1; $i <= count($arr); $i++)
+    {
+        // Concatenate to the front
+        $string = $string . $arr[$i];
+        $string = $string . " ";
+                    
+        // If 'n' words, then break (-1 to compensate starting index = 0)
+        if ($i - $index == $num - 1)
+        {
+            // If end not reached, add '...'
+            if ($i != count($arr))
+                $string = $string . "...";
+            
+            break;
+        }
+    }
+    
+    // Returning the 'n' words (string)
+    return $string;
 }
 
 // Sending the user entered query as a string to Java for processing, then getting the OK from Java

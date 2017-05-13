@@ -91,7 +91,7 @@
                         $query = $_POST["searchBar"];
                         
                         // Concatenating query to location
-                        $location .= $query;
+                        $location = $location . $query;
 
                         // Go to location
                         header($location);
