@@ -235,6 +235,9 @@ function get_snippet($id, $query)
             $snippet = rtrim($snippet, '//');
         }
     }
+    
+    if ($snippet == "")
+        $snippet = "No description available as word(s) is/are in the title of the document ONLY or is/are in stemmed form within the document";
 
     // Return the string with the terms of the query entered by the user
     return $snippet;
