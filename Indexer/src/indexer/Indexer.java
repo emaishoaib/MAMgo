@@ -25,7 +25,7 @@ import org.tartarus.snowball.ext.*;
  * implemented file-wise, and not database-wise.
  */
 
-public class IndexerV2
+public class Indexer
 {
 	//NOTE: Storing doc details in DB means it's been indexed
 	
