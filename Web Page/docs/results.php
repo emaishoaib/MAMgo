@@ -64,6 +64,9 @@
                         if (isset($_GET['query']))
                         {
                             $query = $_GET['query'];
+                            
+                            // Escaping any rogue string chars e.g. double quotations, thus displaying it when 'echo'
+                            $display = htmlspecialchars($query, ENT_QUOTES, 'UTF-8');
                         }
                     ?>
                     
@@ -71,8 +74,7 @@
                     <form id="search_bar" method = "post">
                         
                         <!--Class of text is set as so based on Twitter's typeahead.js. Value is set as so in order to display $query-->
-                        <input type="text" class ="typeahead tt-query" name="searchBar" 
-                               autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
+                        <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $display?>">
 
                         <!--alt="submit" makes the png icon like a submit button, submitting the form and thus setting the POST-->
                         <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
@@ -117,7 +119,7 @@
                         exit;
                     }
                      
-                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test
+                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test. NOTE this test parameter can even be added through the search bar by typing the query, followed by '&test'
                     if (isset($_GET['test']))
                     {
                         // test_ui() is defined in 'controller.php'

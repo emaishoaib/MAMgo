@@ -130,33 +130,32 @@ function get_snippet($id, $query)
 {
     // $connection is defined in 'db_handler.php'
     global $connection;
-    
-    //$result = "<b>Doc ID:</b> $id <br>";
-    
+        
     // Variable to store the description snippet
     $snippet = "";
     
     // Storing the directory of the HTML doc as a string in variable $html_dir
     $html_dir = "../_crawler/HTMLs/$id.html";
     
-    // Extracting the HTML code as an object from HTML document in multiple variables, each whose name indicate what HTML code is there
-    $html_code_all = file_get_html($html_dir);
-    $html_code_no_title = file_get_html($html_dir);
+    // Extracting the HTML code as an object from HTML document
+    $html_code = file_get_html($html_dir);
     
     // Removing the desired tags from HTML code object. The HTML code object is passed by reference
-    remove_tag($html_code_no_title, 'title');
+    remove_tag($html_code, 'title');
+    remove_tag($html_code, 'script');
     
     // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object
-    $head_no_title = $html_code_no_title->find('head');
-    $body_no_title = $html_code_no_title->find('body');
+    $html_body = $html_code->find('body');
     
-    //echo $html_code_no_title->plaintext;
-    
-    // If $query is just a single word
-    if (str_word_count($query) == 1)
+    // If $query is just a single word or there are double quotations (phrase searching)
+    if (str_word_count($query) == 1 or strpos($query, '"') !== FALSE)   // Somehow saying '== TRUE' instead doesn't work
     {
-        // For each tag number object in the tag type's array $body_no_title
-        foreach ($body_no_title as $tag_num)
+        // If $query has double quotations, remove them
+        if (strpos($query, '"') !== FALSE)
+            $query = preg_replace("/\"/", "", $query);
+        
+        // For each tag number of the particular tag type, in this case <body> tag. Usually, there is only one <body> in an HTML document, thus only $html_body[0], but foreach() used just in case there is more than one <body> in the HTMl document
+        foreach ($html_body as $tag_num)
         {
             // Plaintext of the current tag number
             $text = $tag_num->plaintext;
@@ -164,26 +163,14 @@ function get_snippet($id, $query)
             // Splitting text into string array on space
             $text_arr = preg_split("/[\s]+/", $text);
             
-            // If the query word is in that tag number (stripos() not strpos() as former is case insensitive)
-            if (stripos($text, $query) == TRUE)
+            // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
+            if (preg_match("/\b".preg_quote($query)."\b/i", $text))
             {
-                // Getting the first occurence of $query in the string, using 'true' to get all that precedes it (excluding occurence)
-                $preceding = strstr($text, $query, true);
-                
-                // Getting the count of words preceting $query in the string 
-                $count_preceding = str_word_count($preceding);
-                
-                // Getting the first occurence of $query in the string, using 'false' to get all that follows it (including occurence)
-                $following = strstr($text, $query, false);
-                
-                // Getting the count of words following $query in the string
-                $count_following = str_word_count($following);
-                
-                // Storing the position of $query in the string
-                $position = $count_preceding + 1;
+                // Getting the position of $query in the string
+                $position = get_word_pos($text, $query);
                              
-                // Getting $query in the string
-                $snippet = " " . $query . " ";
+                // Setting $snippet to $query as positioned in the text, with spaces on both sides
+                $snippet = " " . $text_arr[$position] . " ";
                 
                 // Getting 'n' words before $query in the string, concatenating it to $snippet
                 $snippet = get_n_preceding($text_arr, $position, 20) . $snippet;
@@ -193,6 +180,9 @@ function get_snippet($id, $query)
                 
                 // Replacing the $query occurence with itself surrounded by bold tags (regex)
                 $snippet = preg_replace("/$query/i", "<b>\$0</b>", $snippet);
+                
+                // No need to search in the remaning <body> tags, if there is more
+                break;
             }
         }
     }
@@ -201,17 +191,6 @@ function get_snippet($id, $query)
     if (strlen($query) > 1 && strpos($query, '"') == FALSE)
     {
     }
-    
-    // If $query is multiple words, and with quotations
-    if (strlen($query) > 1 && strpos($query, '"') == TRUE)
-    {
-    }
-
-    // Extracting the <p> tag
-    //$title = $html_code_all->find('title', 0);
-    
-    // Getting the plaintext of the tag
-    //$result = $title->plaintext;
 
     // Return the string with the terms of the query entered by the user
     return $snippet;
@@ -238,6 +217,22 @@ function remove_tag(&$html_obj, $tag)
     //$save_state = $html_code_no_title->save();
     // ...and reloading
     //$html_code_no_title->load($save_state); 
+}
+
+// Function to get the position of a word in a string
+function get_word_pos($string, $substring)
+{
+    // Getting the first occurence of word in the string, using 'true' to get all that precedes it (excluding occurence)
+    $preceding = strstr($string, $substring, true);
+                
+    // Getting the count of words preceting the word in the string 
+    $count_preceding = str_word_count($preceding);
+                
+    // Storing the position of the word
+    $index = $count_preceding + 1;
+    
+    // Returning the positon
+    return $index;
 }
 
 // Function to get 'n' words before the current index, as a string
