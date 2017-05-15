@@ -186,10 +186,54 @@ function get_snippet($id, $query)
             }
         }
     }
-    
+        
     // If $query is multiple words, and without quotations
-    if (strlen($query) > 1 && strpos($query, '"') == FALSE)
-    {
+    if (str_word_count($query) > 1 && strpos($query, '"') == FALSE)
+    {        
+        // Splitting the query entered by user ($query) into string array on space
+        $query_arr = preg_split("/[\s]+/", $query);
+        
+        // For each tag number of the particular tag type, in this case <body> tag. Usually, there is only one <body> in an HTML document, thus only $html_body[0], but foreach() used just in case there is more than one <body> in the HTMl document
+        foreach ($html_body as $tag_num)
+        {
+            // Plaintext of the current tag number
+            $text = $tag_num->plaintext;
+
+            // Splitting text into string array on space
+            $text_arr = preg_split("/[\s]+/", $text);
+            
+            // For each word in $query_arr
+            foreach ($query_arr as $query_word)
+            {
+                // Part of the snippet, for each word in $query
+                $snippet_part = "";
+                
+                // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
+                if (preg_match("/\b".preg_quote($query_word)."\b/i", $text))
+                {
+                    // Getting the position of $query_word in the string
+                    $position = get_word_pos($text, $query_word);
+
+                    // Setting $snippet_part to $query_word as positioned in the text, with spaces on both sides
+                    $snippet_part = " " . $text_arr[$position] . " ";
+
+                    // Getting 'n' words before $query_word in the string, concatenating it to $snippet_part
+                    $snippet_part = get_n_preceding($text_arr, $position, 5) . $snippet_part;
+
+                    // Getting 'n' words after $query_word in the string, concatenating it to $snippet_part
+                    $snippet_part = $snippet_part . get_n_following($text_arr, $position, 5);
+
+                    // Replacing the $query_word occurence with itself surrounded by bold tags (regex)
+                    $snippet_part = preg_replace("/$query_word/i", "<b>\$0</b>", $snippet_part);
+                }
+                
+                // Concatenating $snippet_part to $snippet, adding '...' at the end to indicate spearation between each sentence having one of $query's words
+                $snippet = $snippet . $snippet_part . "//";
+            }
+            
+            // Trimming out the last '//'
+            $snippet = rtrim($snippet, '//');
+        }
     }
 
     // Return the string with the terms of the query entered by the user

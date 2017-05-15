@@ -119,7 +119,7 @@
                         exit;
                     }
                      
-                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test. NOTE this test parameter can even be added through the search bar by typing the query, followed by '&test'
+                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test. NOTE this test parameter can even be added through the search bar by typing the query, followed by '&test' with no spaces precedint '$test'
                     if (isset($_GET['test']))
                     {
                         // test_ui() is defined in 'controller.php'
