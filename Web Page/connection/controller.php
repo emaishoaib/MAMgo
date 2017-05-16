@@ -154,7 +154,9 @@ function get_snippet($id, $query)
     {
         // If $query has double quotations, remove them
         if (strpos($query, '"') !== FALSE)
-            $query = preg_replace("/\"/", "", $query);
+            $final_query = preg_replace("/\"/", "", $query);
+        else
+            $final_query = $query;
         
         // For each tag number of the particular tag type, in this case <body> tag. Usually, there is only one <body> in an HTML document, thus only $html_body[0], but foreach() used just in case there is more than one <body> in the HTMl document
         foreach ($html_body as $tag_num)
@@ -166,10 +168,10 @@ function get_snippet($id, $query)
             $text_arr = preg_split("/[\s]+/", $text);
             
             // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
-            if (preg_match("/\b".preg_quote($query)."\b/i", $text))
+            if (preg_match("/\b".preg_quote($final_query)."\b/i", $text))
             {
                 // Getting the position of $query in the string
-                $position = get_word_pos($text, $query);
+                $position = get_word_pos($text, $final_query);
                              
                 // Setting $snippet to $query as positioned in the text, with spaces on both sides
                 $snippet = " " . $text_arr[$position] . " ";
@@ -181,7 +183,7 @@ function get_snippet($id, $query)
                 $snippet = $snippet . get_n_following($text_arr, $position, 20);
                 
                 // Replacing the $query occurence with itself surrounded by bold tags (regex)
-                $snippet = preg_replace("/$query/i", "<b>\$0</b>", $snippet);
+                $snippet = preg_replace("/$final_query/i", "<b>\$0</b>", $snippet);
                 
                 // No need to search in the remaning <body> tags, if there is more
                 break;
