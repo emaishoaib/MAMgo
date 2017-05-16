@@ -329,7 +329,7 @@ public class QueryProcessor
 			System.out.println("User query recieved:");
 			System.out.println(query);
 			
-			//Sending user query to processQuery method for processing and storing results in 'results_view'
+			//Sending user query to processQuery method for processing and storing result set in 'results_view'
 			boolean result;
 			if(query != null)
 				result = processQuery(query);
