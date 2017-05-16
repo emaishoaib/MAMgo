@@ -144,6 +144,8 @@ function get_snippet($id, $query)
     remove_tag($html_code, 'title');
     remove_tag($html_code, 'script');
     
+    //THINK ABOUT TAKING THE <html> TAG ITSELF
+    
     // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object
     $html_body = $html_code->find('body');
     

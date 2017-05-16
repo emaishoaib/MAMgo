@@ -156,7 +156,7 @@
                 ?>
                 
                 <!--Message conveying no searh results found-->
-                <p>No results found</p>
+                <p>No Results Found</p>
                 
                 <?php
                     }
@@ -213,14 +213,10 @@
                     </ul>
                 
                 <?php
-                        }
+                            }
                 ?>
                 
                 </ul>
-                
-                <?php
-                    }
-                ?>
                 
                 <!--Section to contain the pages links (pagination)-->
                 <div id="pages">
@@ -271,6 +267,10 @@
                     
                 </div>
                 
+                <?php
+                    }
+                ?>
+  
             </div>
             
         </div>
