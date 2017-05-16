@@ -143,11 +143,10 @@ function get_snippet($id, $query)
     // Removing the desired tags from HTML code object. The HTML code object is passed by reference
     remove_tag($html_code, 'title');
     remove_tag($html_code, 'script');
-    
-    //THINK ABOUT TAKING THE <html> TAG ITSELF
-    
-    // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object
-    $html_body = $html_code->find('body');
+    remove_tag($html_code, 'style');
+        
+    // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object. Remember, <title>, <script> and <style> tags were removed previously, which justifies the term 'content'
+    $html_content = $html_code->find('html');
     
     // If $query is just a single word or there are double quotations (phrase searching)
     if (str_word_count($query) == 1 or strpos($query, '"') !== FALSE)   // Somehow saying '== TRUE' instead doesn't work
@@ -158,8 +157,8 @@ function get_snippet($id, $query)
         else
             $final_query = $query;
         
-        // For each tag number of the particular tag type, in this case <body> tag. Usually, there is only one <body> in an HTML document, thus only $html_body[0], but foreach() used just in case there is more than one <body> in the HTMl document
-        foreach ($html_body as $tag_num)
+        // For each tag number of the particular tag type, in this case <html> tag. Usually, there is only one <html> in an HTML document, thus only $html_content[0], but foreach() used just in case there is more than one <html> in the HTMl document
+        foreach ($html_content as $tag_num)
         {
             // Plaintext of the current tag number
             $text = $tag_num->plaintext;
@@ -185,20 +184,23 @@ function get_snippet($id, $query)
                 // Replacing the $query occurence with itself surrounded by bold tags (regex)
                 $snippet = preg_replace("/$final_query/i", "<b>\$0</b>", $snippet);
                 
-                // No need to search in the remaning <body> tags, if there is more
+                // No need to search in the remaning <html> tags, if there is more
                 break;
             }
         }
     }
-        
+       
+    if ($snippet == "")
+        $snippet = "No description available as word or phrase is in the title of the document only or is in stemmed form only within the document";
+    
     // If $query is multiple words, and without quotations
     if (str_word_count($query) > 1 && strpos($query, '"') == FALSE)
     {        
         // Splitting the query entered by user ($query) into string array on space
         $query_arr = preg_split("/[\s]+/", $query);
         
-        // For each tag number of the particular tag type, in this case <body> tag. Usually, there is only one <body> in an HTML document, thus only $html_body[0], but foreach() used just in case there is more than one <body> in the HTMl document
-        foreach ($html_body as $tag_num)
+        // For each tag number of the particular tag type, in this case <html> tag. Usually, there is only one <html> in an HTML document, thus only $html_content[0], but foreach() used just in case there is more than one <html> in the HTMl document
+        foreach ($html_content as $tag_num)
         {
             // Plaintext of the current tag number
             $text = $tag_num->plaintext;
@@ -241,7 +243,7 @@ function get_snippet($id, $query)
     }
     
     if ($snippet == "")
-        $snippet = "No description available as word(s) is/are in the title of the document ONLY or is/are in stemmed form within the document";
+        $snippet = "No description available as word are in the title of the document only or are in stemmed form only within the document";
 
     // Return the string with the terms of the query entered by the user
     return $snippet;
