@@ -102,7 +102,8 @@ public class QueryProcessor
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
-
+				
+				finalQuery = query;
 			}
 			else
 			{
@@ -267,14 +268,15 @@ public class QueryProcessor
 					}
 					ps.execute();
 				}
+				
+				finalQuery = words.toString();
 			}
 
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-
-		finalQuery = words.toString();
+		
 		return true;
 	}
 	
