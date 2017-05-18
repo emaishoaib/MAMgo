@@ -20,7 +20,6 @@ public class QueryProcessor
 	private static String finalQuery;
 	
 	//Function that takes the query input by user and processes it
-	//Function that takes the query input by user and processes it
 	public static boolean processQuery(String query)
 	{
 		singleSW = false;
