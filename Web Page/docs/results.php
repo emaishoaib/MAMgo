@@ -132,10 +132,8 @@
                         // Sending the query to Java for processing
                         send_query($query);
                                
-                        // Receiving response from Java
-                        $resp = receive_response();
-                               
-                        //echo $resp;
+                        // Receiving response from Java; this response is the query after processing, but before stemming
+                        $respQuery = receive_response();                            
                     }
                 ?>
                     
@@ -146,6 +144,31 @@
             <div id = "results">
                 
                 <?php
+
+                    // Checking if query was processed and results view created in the first place
+                    if ($respQuery == "-1\n")
+                    {
+                ?>
+                
+                <!--Message conveying query was not processed-->
+                <p>Query Not Processed</p>
+                
+                
+                <?php
+                        // If query not processed, then exit and don't continue running
+                        exit();
+                    }
+                    else
+                    {                        
+                        // Assigning this new query to the variable of the original query
+                        $query = $respQuery;
+                        
+                        // The string returned by Java takes the form of a string starting with '[', ending with ']' and each word separated with ',' thus we remove all
+                        $query = str_replace(array('[', ',', ']', '\n'), '' , $query);
+                        
+                        // When performing strlen() on $query, there seems to be a hidden character that results from port communication, thus remove hidden characters
+                        $query = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $query);
+                    }
                 
                     // Getting the results
                     $result_records = get_results();
@@ -200,7 +223,7 @@
                                     // Getting the description snippet, by sending to 'get_snippet()':
                                     //      - The current record's ID with the value stored in the current row's docID
                                     //      - The query entered by the user found in the URL
-                                    $snippet = get_snippet($row['docID'], $_GET['query']);
+                                    $snippet = get_snippet($row['docID'], $query);
                                                                 
                                     // Echoing the description snippet
                                     echo $snippet;

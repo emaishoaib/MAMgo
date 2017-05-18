@@ -345,10 +345,23 @@ public class QueryProcessor
 			System.out.println("User query recieved:");
 			System.out.println(query);
 			
+			boolean result = false;
+			String queryResponse = "";
+			
 			//Sending user query to processQuery method for processing and storing result set in 'results_view'
-			boolean result;
 			if(query != null)
 				result = processQuery(query);
+			
+			//Checking if there was a result in the first place...
+			//...if positive, then store query after processing (before stemming)
+			if (result == true)
+			{
+				queryResponse = finalQuery;
+				queryResponse = queryResponse + "\n";
+			}
+			//...if negative, then query was not processed thus store '-1' as an indication
+			else
+				queryResponse = "-1\n";
 
 			// Listen to port 1236
 			try
@@ -365,7 +378,7 @@ public class QueryProcessor
 			try
 			{
 				PrintStream ps = new PrintStream(socket_wr.getOutputStream());
-				ps.print("Query received\n");					
+				ps.print(queryResponse);					
 			}
 			catch (Exception e)
 			{

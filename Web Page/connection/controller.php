@@ -150,7 +150,7 @@ function get_snippet($id, $query)
     
     // If $query is just a single word or there are double quotations (phrase searching)
     if (str_word_count($query) == 1 or strpos($query, '"') !== FALSE)   // Somehow saying '== TRUE' instead doesn't work
-    {
+    {        
         // If $query has double quotations, remove them
         if (strpos($query, '"') !== FALSE)
             $final_query = preg_replace("/\"/", "", $query);
@@ -168,7 +168,7 @@ function get_snippet($id, $query)
             
             // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
             if (preg_match("/\b".preg_quote($final_query)."\b/i", $text))
-            {
+            {                
                 // Getting the position of $query in the string
                 $position = get_word_pos($text, $final_query);
                              
@@ -189,13 +189,10 @@ function get_snippet($id, $query)
             }
         }
     }
-       
-    if ($snippet == "")
-        $snippet = "No description available as word or phrase is in the title of the document only or is in stemmed form only within the document";
     
     // If $query is multiple words, and without quotations
-    if (str_word_count($query) > 1 && strpos($query, '"') == FALSE)
-    {        
+    if (str_word_count($query) > 1 && strpos($query, '"') === FALSE)
+    {                
         // Splitting the query entered by user ($query) into string array on space
         $query_arr = preg_split("/[\s]+/", $query);
         
@@ -211,12 +208,12 @@ function get_snippet($id, $query)
             // For each word in $query_arr
             foreach ($query_arr as $query_word)
             {
-                // Part of the snippet, for each word in $query
+                // Part of the snippet for each word in $query
                 $snippet_part = "";
                 
                 // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
                 if (preg_match("/\b".preg_quote($query_word)."\b/i", $text))
-                {
+                {   
                     // Getting the position of $query_word in the string
                     $position = get_word_pos($text, $query_word);
 
@@ -230,11 +227,13 @@ function get_snippet($id, $query)
                     $snippet_part = $snippet_part . get_n_following($text_arr, $position, 5);
 
                     // Replacing the $query_word occurence with itself surrounded by bold tags (regex)
-                    $snippet_part = preg_replace("/$query_word/i", "<b>\$0</b>", $snippet_part);
+                    $snippet_part = preg_replace("/$query_word/i", "<b>\$0</b>", $snippet_part);                    
                 }
                 
-                // Concatenating $snippet_part to $snippet, adding '...' at the end to indicate spearation between each sentence having one of $query's words
-                $snippet = $snippet . $snippet_part . "//";
+                // If $snippet_part is not empty, a snippet text was found for the current term in the query word, and thus concatenate...
+                if ($snippet_part != "")
+                    // ...$snippet_part to $snippet, followed by "//" to indicate separation between each term's text snippet
+                    $snippet = $snippet . $snippet_part . "//";
             }
             
             // Trimming out the last '//'
@@ -243,7 +242,7 @@ function get_snippet($id, $query)
     }
     
     if ($snippet == "")
-        $snippet = "No description available as word are in the title of the document only or are in stemmed form only within the document";
+        $snippet = "No description available as query's terms are in the title of the document only or are in stemmed form only within the document";
 
     // Return the string with the terms of the query entered by the user
     return $snippet;
