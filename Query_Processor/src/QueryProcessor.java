@@ -25,7 +25,7 @@ public class QueryProcessor
 		singleSW = false;
 		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
-		String password = "11147878";
+		String password = "";
 		ArrayList<String> words;
 		ArrayList<String> wordsST;
 		ArrayList<String> stems = new ArrayList<String>();
@@ -98,7 +98,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view results_view as select distinct a.docID, b.docTitle, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -180,7 +180,7 @@ public class QueryProcessor
 					
 					for(int i = 0; i < words.size(); i++)
 					{
-						sqlST = sqlST + "union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID ";
+						sqlST = sqlST + "union select distinct a.docID, b.docTitle, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID ";
 					}
 					
 					if(stems.size() > 0)
@@ -251,11 +251,11 @@ public class QueryProcessor
 						stems.add(stemmed);	
 					}
 
-					sqlST = "create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view results_view as select distinct a.docID, b.docTitle, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + " union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+						sqlST = sqlST + " union select distinct a.docID, b.docTitle, b.docLink from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 					}
 
 					sqlST = sqlST + " order by docID";
