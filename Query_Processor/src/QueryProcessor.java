@@ -16,6 +16,9 @@ public class QueryProcessor
 	//If this is set to true then the user tried to search for a stopword
 	private static boolean singleSW = false;
 	
+	//This string contains the final string after processing
+	private static String finalQuery;
+	
 	//Function that takes the query input by user and processes it
 	public static boolean processQuery(String query)
 	{
@@ -112,8 +115,8 @@ public class QueryProcessor
 				
 				wordsST = new ArrayList<String>(words);
 				String sqlST = "";
-				boolean KeepStopWords = true;
-				boolean AllStopWords = true;
+				boolean KeepStopWords = true; //This flag checks if there are words that are not stop words
+				boolean AllStopWords = true; //This flag checks if the string consists of stop words only
 				
 				if(words.size() > 1)
 				{
@@ -151,6 +154,7 @@ public class QueryProcessor
 					{
 						words = new ArrayList<String>(wordsST);
 					}
+					
 
 					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
@@ -261,6 +265,7 @@ public class QueryProcessor
 			return false;
 		}
 
+		finalQuery = words.toString();
 		return true;
 	}
 	
