@@ -25,7 +25,7 @@ public class QueryProcessor
 		singleSW = false;
 		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
-		String password = "";
+		String password = "11147878";
 		ArrayList<String> words;
 		ArrayList<String> wordsST;
 		ArrayList<String> stems = new ArrayList<String>();
@@ -180,7 +180,7 @@ public class QueryProcessor
 					
 					for(int i = 0; i < words.size(); i++)
 					{
-						sqlST = sqlST + "union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+						sqlST = sqlST + "union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID ";
 					}
 					
 					if(stems.size() > 0)
@@ -220,7 +220,7 @@ public class QueryProcessor
 					
 					for(int i = 0; i < words.size(); i++)
 					{
-						ps.setString(i + words.size(), words.get(i));
+						ps.setString(i + words.size() + 1, words.get(i));
 					}
 
 					for(int i = 0; i < stems.size(); i++)
