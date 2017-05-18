@@ -20,12 +20,13 @@ public class QueryProcessor
 	private static String finalQuery;
 	
 	//Function that takes the query input by user and processes it
+	//Function that takes the query input by user and processes it
 	public static boolean processQuery(String query)
 	{
 		singleSW = false;
 		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
-		String password = "";
+		String password = "11147878";
 		ArrayList<String> words;
 		ArrayList<String> wordsST;
 		ArrayList<String> stems = new ArrayList<String>();
@@ -154,7 +155,6 @@ public class QueryProcessor
 					{
 						words = new ArrayList<String>(wordsST);
 					}
-					
 
 					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
@@ -178,7 +178,12 @@ public class QueryProcessor
 					}
 
 					sqlST = sqlST + "a0.docID in (select docID from pos_index group by docID having count(*) > 1)) ";
-
+					
+					for(int i = 0; i < words.size(); i++)
+					{
+						sqlST = sqlST + "union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					}
+					
 					if(stems.size() > 0)
 					{
 						sqlST = sqlST + "union select distinct * from doc_links where docID in (select a0.docID from ";
@@ -204,7 +209,7 @@ public class QueryProcessor
 
 						sqlST = sqlST + "a0.docID in (select docID from pos_index group by docID having count(*) > 1)) ";
 					}
-
+					
 					sqlST = sqlST + "order by docID";
 
 					ps = con.prepareStatement(sqlST);
@@ -213,10 +218,15 @@ public class QueryProcessor
 					{
 						ps.setString(i + 1, words.get(i));
 					}
+					
+					for(int i = 0; i < words.size(); i++)
+					{
+						ps.setString(i + words.size(), words.get(i));
+					}
 
 					for(int i = 0; i < stems.size(); i++)
 					{
-						ps.setString(i + words.size() + 1, stems.get(i));
+						ps.setString(i + 2 * words.size() + 1, stems.get(i));
 					}
 
 					ps.execute();
