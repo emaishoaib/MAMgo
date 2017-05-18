@@ -43,6 +43,7 @@ public class QueryProcessor
 			{
 				//Phrase searching
 
+				finalQuery = query;
 				query = query.substring(1, query.length() - 1);
 
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
@@ -102,8 +103,7 @@ public class QueryProcessor
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
-				
-				finalQuery = query;
+
 			}
 			else
 			{
