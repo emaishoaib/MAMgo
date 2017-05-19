@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 19, 2017 at 08:35 PM
+-- Generation Time: May 19, 2017 at 09:36 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -31,7 +31,8 @@ CREATE TABLE `doc_links` (
   `docID` int(11) NOT NULL,
   `docTitle` varchar(255) DEFAULT 'None Available',
   `docLink` varchar(255) NOT NULL,
-  `docHits` int(11) NOT NULL DEFAULT '1'
+  `docHits` int(11) NOT NULL DEFAULT '1',
+  `isIndexed` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -163,6 +164,15 @@ ALTER TABLE `tag_index`
   ADD PRIMARY KEY (`term`,`docID`),
   ADD KEY `docID` (`docID`);
 
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `doc_links`
+--
+ALTER TABLE `doc_links`
+  MODIFY `docID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- Constraints for dumped tables
 --
