@@ -1,18 +1,18 @@
 package source;
 
 import java.util.*;
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.io.*;
 import java.net.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-//import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-//import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -27,15 +27,8 @@ import org.jsoup.select.Elements;
 
 import source.SimpleRobotRules.RobotRulesMode;
 
-class Links {
-
-	String urls;
-	Integer counts;
-
-}
-
 @SuppressWarnings("unused")
-public class crawler implements Runnable
+public class crawlerBackup implements Runnable
 {
 	static private String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\state.txt";
 	static private String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\links.txt";
@@ -44,8 +37,6 @@ public class crawler implements Runnable
 	private int threads;
 	private int maxDepth;
 	private Set<String> visited;
-	private ArrayList<Links> counts;
-	private ArrayList<String> listOfLinks;
 	private ArrayList<String> unvisited;
 	private int state;
 	private long crawlDelay = 0;
@@ -55,44 +46,33 @@ public class crawler implements Runnable
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
 	Object lock = new Object();
 	
-	public crawler(Set<String> visited, ArrayList<Links> counts, ArrayList<String> listOfLinks, ArrayList<String> unvisited, int threads, int maxDepth, int state)
+	public crawlerBackup(Set<String> visited, ArrayList<String> unvisited, int threads, int maxDepth, int state)
 	{
 		this.threads = threads > 0 ? threads : 1;
 		this.maxDepth = maxDepth;
 		this.visited = visited;
-		this.counts = counts;
-		this.listOfLinks = listOfLinks;
 		this.unvisited = unvisited;
 		this.state = state;
 	}
 		
 	private synchronized String nextUrl()
 	{
-		int index;
-		String nextUrl = "";
-		Links link = new Links();
-
-		do
-		{
-			if(unvisited.size() == 0)
-			{
-				return "";
-			}
-			nextUrl = unvisited.remove(0);
-		}
-		while(visited.contains(nextUrl));
-
-		if(!nextUrl.equals(""))
-		{
-			visited.add(nextUrl);
-			index = listOfLinks.indexOf(nextUrl);
-			link = counts.get(index);
-			counts.remove(index);
-			link.counts++;
-			counts.add(listOfLinks.indexOf(nextUrl), link);
-		}
-
-		return nextUrl;
+	      String nextUrl = "";
+	      
+	      do
+	      {
+	    	  if(unvisited.size() == 0)
+	    	  {
+	    		  return "";
+	    	  }
+	    	  nextUrl = unvisited.remove(0);
+	      }
+	      while(visited.contains(nextUrl));
+	    	  
+	      if(!nextUrl.equals(""))
+	    	  visited.add(nextUrl);
+          
+	      return nextUrl;
 	}
 	
 	@Override
@@ -106,7 +86,6 @@ public class crawler implements Runnable
 	
 	private synchronized boolean addUnvisited(String URL)
 	{
-		Links temp = new Links();
 		return unvisited.add(URL);
 	}
 	
@@ -121,20 +100,15 @@ public class crawler implements Runnable
 		
 		try(BufferedWriter file = new BufferedWriter(new FileWriter(links_txt, false))) {
 			
-			for(Links link : counts)
+			for(String urls : visited)
 			{
-				file.write(String.valueOf(link.counts) + " " + link.urls + "\n");
+				file.write(urls + "\n");
 			}
-//			
-//			for(String urls : visited)
-//			{
-//				file.write(urls + "\n");
-//			}
-//			
-//			for(String urls : unvisited)
-//			{
-//				file.write(urls + "\n");
-//			}
+			
+			for(String urls : unvisited)
+			{
+				file.write(urls + "\n");
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -204,9 +178,6 @@ public class crawler implements Runnable
 		String l;
 		int end;
 		
-		int index;
-		Links tempLink = new Links();
-		
 		if(depth <= maxDepth)
 		{
 
@@ -239,8 +210,8 @@ public class crawler implements Runnable
 					else
 					{
 						return;
-					}				
-				}
+					}				}
+				
 				if(!connection.response().contentType().contains("text/html"))
 				{
 					System.out.println("**Failure** Retrieved something other than HTML");
@@ -253,8 +224,7 @@ public class crawler implements Runnable
 					else
 					{
 						return;
-					}				
-				}
+					}				}
 				
 				links = doc.select("a[href]");
 				
@@ -289,15 +259,6 @@ public class crawler implements Runnable
 							{
 								System.out.println("**Failure** " + URL + " was visited before");
 							}
-							
-						}
-						else
-						{
-							index = listOfLinks.indexOf(l);
-							tempLink = counts.get(index);
-							counts.remove(index);
-							tempLink.counts++;
-							counts.add(listOfLinks.indexOf(l), tempLink);
 						}
 					}
 				}
@@ -322,10 +283,7 @@ public class crawler implements Runnable
 	public static void main(String[] args) 
 	{
 		Set<String> visited = new LinkedHashSet<String>();
-		ArrayList<Links> counts = new ArrayList<Links>();
 		ArrayList<String> unvisited = new ArrayList<String>();
-		ArrayList<String> listOfLinks = new ArrayList<String>();
-		String[] data;
 		Thread[] threads;
 		String line;
 		int state = 0;
@@ -346,24 +304,15 @@ public class crawler implements Runnable
 			
 			while((line = file.readLine()) != null)
 			{
-				data = line.split(" ");
-				Links temp = new Links();
-				
 				i++;
 				if(i < state)
 				{
-					visited.add(data[1]);
+					visited.add(line);
 				}
 				else
 				{
-					unvisited.add(data[1]);
+					unvisited.add(line);
 				}
-				
-				temp.counts = Integer.parseInt(data[0]);
-				temp.urls = data[1];
-				
-				listOfLinks.add(data[1]);
-				counts.add(temp);
 			}
 
 		} catch(IOException e)
@@ -375,7 +324,7 @@ public class crawler implements Runnable
 		
 		if(!unvisited.isEmpty())
 		{
-			crawler c1 = new crawler(visited, counts, unvisited, listOfLinks, 1, 10, state);
+			crawlerBackup c1 = new crawlerBackup(visited, unvisited, 1, 10, state);
 			
 			for(int i = 0; i < nt; i++)
 			{
@@ -401,7 +350,7 @@ public class crawler implements Runnable
 		{
 			//defensive coding URL
 			unvisited.add("http://www.mkyong.com");
-			crawler c1 = new crawler(visited, counts, unvisited, listOfLinks, 1, 10, state);
+			crawlerBackup c1 = new crawlerBackup(visited, unvisited, 1, 10, state);
 			
 			for(int i = 0; i < nt; i++)
 			{
