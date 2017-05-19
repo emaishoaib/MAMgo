@@ -147,7 +147,7 @@ function get_snippet($id, $query)
         
     // Selecting (filtering) the desired tags. Since no tag number specified, all tags of that type are selected and added to an array, each tag number occupying a slot in the array as an object. Remember, <title>, <script> and <style> tags were removed previously, which justifies the term 'content'
     $html_content = $html_code->find('html');
-    
+        
     // If $query is just a single word or there are double quotations (phrase searching)
     if (str_word_count($query) == 1 or strpos($query, '"') !== FALSE)   // Somehow saying '== TRUE' instead doesn't work
     {        
@@ -163,25 +163,36 @@ function get_snippet($id, $query)
             // Plaintext of the current tag number
             $text = $tag_num->plaintext;
 
-            // Splitting text into string array on space
-            $text_arr = preg_split("/[\s]+/", $text);
+            // Removing all kinds of special characters
+            $text = preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '', $text);
+            
+            // Cleaning the string from left and right because sometimes there can be many empty spaces (INDEXER ISSUE AS WELL MAYBE)
+            $text = ltrim($text);
+            $text = rtrim($text);
             
             // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
             if (preg_match("/\b".preg_quote($final_query)."\b/i", $text))
-            {                
-                // Getting the position of $query in the string
-                $position = get_word_pos($text, $final_query);
-                             
-                // Setting $snippet to $query as positioned in the text, with spaces on both sides
-                $snippet = " " . $text_arr[$position] . " ";
+            {                     
+                // Getting the position of the first character of the query (stripos() not strpos() as former case insensitive)
+                $queryStart = stripos($text, $final_query);
                 
-                // Getting 'n' words before $query in the string, concatenating it to $snippet
-                $snippet = get_n_preceding($text_arr, $position, 20) . $snippet;
+                // Getting the position of the last character of the query
+                $queryEnd = $queryStart + strlen($final_query);
+                                
+                // Getting substring starting from number of characters desired before query, for the length of 100
+                $before = get_n_preceding($text, $queryStart, 110);
+
+                // Getting the query itself (starting from first character of query, for the length of the query)
+                $at = substr($text, $queryStart, $queryEnd - $queryStart);
                 
-                // Getting 'n' words after $query in the string, concatenating it to $snippet
-                $snippet = $snippet . get_n_following($text_arr, $position, 20);
+                // Getting the substring starting from right after query, for the length of 100
+                $after = get_n_following($text, $queryEnd, 110);
+  
+                // Conctaneating into the snippet
+                $snippet = $before . " " . $at . " " . $after;
                 
-                // Replacing the $query occurence with itself surrounded by bold tags (regex)
+                // Replacing the $query occurence with itself surrounded by bold tags (regex)...
+                // ...preg_replace used to include all occurrences inconsiderate of capitalization
                 $snippet = preg_replace("/$final_query/i", "<b>\$0</b>", $snippet);
                 
                 // No need to search in the remaning <html> tags, if there is more
@@ -202,8 +213,12 @@ function get_snippet($id, $query)
             // Plaintext of the current tag number
             $text = $tag_num->plaintext;
 
-            // Splitting text into string array on space
-            $text_arr = preg_split("/[\s]+/", $text);
+            // Removing all kinds of special characters
+            $text = preg_replace('/[^a-zA-Z0-9_ %\[\]\.\(\)%&-]/s', '', $text);
+            
+            // Cleaning the string from left and right because sometimes there can be many empty spaces (INDEXER ISSUE AS WELL MAYBE)
+            $text = ltrim($text);
+            $text = rtrim($text);
             
             // For each word in $query_arr
             foreach ($query_arr as $query_word)
@@ -214,20 +229,27 @@ function get_snippet($id, $query)
                 // Using preg_match (regex) because strpos won't check each word alone, but also their subparts
                 if (preg_match("/\b".preg_quote($query_word)."\b/i", $text))
                 {   
-                    // Getting the position of $query_word in the string
-                    $position = get_word_pos($text, $query_word);
+                    // Getting the position of the first character of the query (stripos() not strpos() as former case insensitive)
+                    $queryStart = stripos($text, $query_word);
+                
+                    // Getting the position of the last character of the query
+                    $queryEnd = $queryStart + strlen($query_word);
+                
+                    // Getting substring starting from number of characters desired before query, for the length of 100
+                    $before = get_n_preceding($text, $queryStart, 110);
+                    
+                    // Getting the query itself (starting from first character of query, for the length of the query)
+                    $at = substr($text, $queryStart, $queryEnd - $queryStart);
+                
+                    // Getting the substring starting from right after query, for the length of 100
+                    $after = get_n_following($text, $queryEnd, 110);
 
-                    // Setting $snippet_part to $query_word as positioned in the text, with spaces on both sides
-                    $snippet_part = " " . $text_arr[$position] . " ";
-
-                    // Getting 'n' words before $query_word in the string, concatenating it to $snippet_part
-                    $snippet_part = get_n_preceding($text_arr, $position, 5) . $snippet_part;
-
-                    // Getting 'n' words after $query_word in the string, concatenating it to $snippet_part
-                    $snippet_part = $snippet_part . get_n_following($text_arr, $position, 5);
-
-                    // Replacing the $query_word occurence with itself surrounded by bold tags (regex)
-                    $snippet_part = preg_replace("/$query_word/i", "<b>\$0</b>", $snippet_part);                    
+                    // Conctaneating into the snippet
+                    $snippet_part = $before . " " . $at. " " . $after;
+                    
+                    // Replacing the $query occurence with itself surrounded by bold tags (regex)...
+                    // ...preg_replace used to include all occurrences inconsiderate of capitalization
+                    $snippet_part = preg_replace("/$query_word/i", "<b>\$0</b>", $snippet_part);
                 }
                 
                 // If $snippet_part is not empty, a snippet text was found for the current term in the query word, and thus concatenate...
@@ -242,7 +264,7 @@ function get_snippet($id, $query)
     }
     
     if ($snippet == "")
-        $snippet = "No description available as query's terms are in the title of the document only or are in stemmed form only within the document";
+        $snippet = "<em>" . "Query's terms are either the in title of doc or in stemmed form within doc" . "</em>";
 
     // Return the string with the terms of the query entered by the user
     return $snippet;
@@ -271,71 +293,45 @@ function remove_tag(&$html_obj, $tag)
     //$html_code_no_title->load($save_state); 
 }
 
-// Function to get the position of a word in a string
-function get_word_pos($string, $substring)
-{
-    // Getting the first occurence of word in the string, using 'true' to get all that precedes it (excluding occurence)
-    $preceding = strstr($string, $substring, true);
-                
-    // Getting the count of words preceting the word in the string 
-    $count_preceding = str_word_count($preceding);
-                
-    // Storing the position of the word
-    $index = $count_preceding + 1;
-    
-    // Returning the positon
-    return $index;
-}
-
-// Function to get 'n' words before the current index, as a string
-function get_n_preceding($arr, $index, $num)
+// Function to get 'n' words before the position index, as a string
+function get_n_preceding($text, $index, $num)
 {
     $string = "";
-
-    // Getting 'n' words before current index
-    for ($i = $index - 1; $i >= 0; $i--)
+    
+    // If index is greater than or equal to $num
+    if ($index >= $num)
     {
-        // Concatenate to the back
-        $string = $arr[$i] . $string;
-        $string = " " . $string;
-                    
-        // If 'n' words, then break (-1 to compensate starting index = 0)
-        if ($index - $i == $num - 1)
-        {
-            // If start not reached, add '...'
-            if ($i != 0)
-                $string = "..." . $string;
-            
-            break;
-        }
+        // Add ellipses at beginning
+        $string = "...";
+        
+        // Concatenating substring that starts from number of characters $num before index, for the length of number of characters $num
+        $string = $string . substr($text, $index - $num, $num);
     }
+    else
+        // No truncation, thus starting from 0, for the length of number of characters $num
+        $string = substr($text, 0, $index);
     
     // Returning the 'n' words (string)
     return $string;
 }  
 
-// Function to get 'n' words after the current index, as a string
-function get_n_following($arr, $index, $num)
+// Function to get 'n' words after the position of index, as a string
+function get_n_following($text, $index, $num)
 {
     $string = "";
     
-    // Getting 'n' words after the current index
-    for ($i = $index + 1; $i <= count($arr); $i++)
-    {
-        // Concatenate to the front
-        $string = $string . $arr[$i];
-        $string = $string . " ";
-                    
-        // If 'n' words, then break (-1 to compensate starting index = 0)
-        if ($i - $index == $num - 1)
-        {
-            // If end not reached, add '...'
-            if ($i != count($arr))
-                $string = $string . "...";
-            
-            break;
-        }
+    // If what remains in $text starting from $index is greater than or equal to $num
+    if (strlen($text) - $index >= $num)
+    {   
+        // Concatenating substring that starts from index till the number of character $num
+        $string = substr($text, $index, $num);
+                
+        // Add ellipses at end
+        $string = $string . "...";
     }
+    else
+        // No truncation, thus starting from index, for the length of number of remaining characters from index till end of textS
+        $string = substr($text, $index, strlen($text) - $index);
     
     // Returning the 'n' words (string)
     return $string;
