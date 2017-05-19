@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 16, 2017 at 02:05 AM
+-- Generation Time: May 19, 2017 at 08:35 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -27,9 +27,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doc_links` (
+  `docRank` int(11) NOT NULL DEFAULT '1',
   `docID` int(11) NOT NULL,
-  `docTitle` varchar(255) DEFAULT '[In Progress]',
-  `docLink` varchar(255) NOT NULL
+  `docTitle` varchar(255) DEFAULT 'None Available',
+  `docLink` varchar(255) NOT NULL,
+  `docHits` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -61,8 +63,30 @@ CREATE TABLE `queries` (
 --
 
 INSERT INTO `queries` (`query_text`, `query_count`) VALUES
+('"animals are multicellular"', 6),
+('"apples made by"', 9),
+('"apples made of"', 98),
+('"apples made"', 18),
+('"apples"', 3),
+('"bananas made by"', 3),
+('"bananas made of"', 1),
+('"bananas made"', 3),
+('"From Wikipedia"', 4),
+('"made of"', 6),
+('"the free encyclopedia"', 3),
+('animal', 83),
+('animal animation', 63),
+('animal cell', 1),
+('animals', 3),
+('animation', 7),
+('apples', 65),
+('apples made', 72),
 ('Are rhinos really extinct?', 13),
+('bananas', 58),
+('food', 3),
 ('How much is Bill Gate''s salary?', 2),
+('made', 3),
+('policy', 145),
 ('Where is Bill Gates from?', 5),
 ('Where is Jack?', 1),
 ('Where is Jennifer Lawrence from?', 2),
@@ -81,8 +105,8 @@ INSERT INTO `queries` (`query_text`, `query_count`) VALUES
 --
 CREATE TABLE `results_view` (
 `docID` int(11)
-,`docLink` varchar(255)
 ,`docTitle` varchar(255)
+,`docLink` varchar(255)
 );
 
 -- --------------------------------------------------------
@@ -108,7 +132,7 @@ CREATE TABLE `tag_index` (
 --
 DROP TABLE IF EXISTS `results_view`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `results_view`  AS  select distinct `a`.`docID` AS `docID`,`b`.`docLink` AS `docLink`,`b`.`docTitle` AS `docTitle` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'apples') and (`a`.`docID` = `b`.`docID`)) union select distinct `a`.`docID` AS `docID`,`b`.`docLink` AS `docLink`,`b`.`docTitle` AS `docTitle` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'appl') and (`a`.`docID` = `b`.`docID`)) order by `docID` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `results_view`  AS  select distinct `doc_links`.`docID` AS `docID`,`doc_links`.`docTitle` AS `docTitle`,`doc_links`.`docLink` AS `docLink` from `doc_links` where `doc_links`.`docID` in (select `a0`.`docID` from (`pos_index` `a0` join `pos_index` `a1`) where ((`a0`.`term` = 'apples') and (`a1`.`term` = 'made') and (`a0`.`docID` = `a1`.`docID`) and `a0`.`docID` in (select `pos_index`.`docID` from `pos_index` group by `pos_index`.`docID` having (count(0) > 1)))) union select distinct `a`.`docID` AS `docID`,`b`.`docTitle` AS `docTitle`,`b`.`docLink` AS `docLink` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'apples') and (`a`.`docID` = `b`.`docID`)) union select distinct `a`.`docID` AS `docID`,`b`.`docTitle` AS `docTitle`,`b`.`docLink` AS `docLink` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'made') and (`a`.`docID` = `b`.`docID`)) union select distinct `doc_links`.`docID` AS `docID`,`doc_links`.`docTitle` AS `docTitle`,`doc_links`.`docLink` AS `docLink` from `doc_links` where `doc_links`.`docID` in (select `a0`.`docID` from `pos_index` `a0` where ((`a0`.`term` = 'appl') and `a0`.`docID` in (select `pos_index`.`docID` from `pos_index` group by `pos_index`.`docID` having (count(0) > 1)))) order by `docID` ;
 
 --
 -- Indexes for dumped tables
