@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 19, 2017 at 11:11 PM
+-- Generation Time: May 19, 2017 at 11:20 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -31,6 +31,7 @@ CREATE TABLE `doc_links` (
   `docTitle` varchar(255) DEFAULT 'None Available',
   `docLink` varchar(255) DEFAULT NULL,
   `docHits` int(11) NOT NULL DEFAULT '1',
+  `docWordCount` int(11) NOT NULL DEFAULT '0',
   `isIndexed` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
