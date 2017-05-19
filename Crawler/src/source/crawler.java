@@ -84,8 +84,8 @@ public class crawler implements Runnable
 
 		if(!nextUrl.equals(""))
 		{
-			index = listOfLinks.indexOf(nextUrl);
 			visited.add(nextUrl);
+			index = listOfLinks.indexOf(nextUrl);
 			link = counts.get(index);
 			counts.remove(index);
 			link.counts++;
@@ -204,6 +204,9 @@ public class crawler implements Runnable
 		String l;
 		int end;
 		
+		int index;
+		Links tempLink = new Links();
+		
 		if(depth <= maxDepth)
 		{
 
@@ -290,7 +293,11 @@ public class crawler implements Runnable
 						}
 						else
 						{
-							
+							index = listOfLinks.indexOf(l);
+							tempLink = counts.get(index);
+							counts.remove(index);
+							tempLink.counts++;
+							counts.add(listOfLinks.indexOf(l), tempLink);
 						}
 					}
 				}
