@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 19, 2017 at 08:35 PM
+-- Generation Time: May 19, 2017 at 11:11 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -27,11 +27,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doc_links` (
-  `docRank` int(11) NOT NULL DEFAULT '1',
   `docID` int(11) NOT NULL,
   `docTitle` varchar(255) DEFAULT 'None Available',
-  `docLink` varchar(255) NOT NULL,
-  `docHits` int(11) NOT NULL DEFAULT '1'
+  `docLink` varchar(255) DEFAULT NULL,
+  `docHits` int(11) NOT NULL DEFAULT '1',
+  `isIndexed` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -101,13 +101,16 @@ INSERT INTO `queries` (`query_text`, `query_count`) VALUES
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `results_view`
+-- Table structure for table `results`
 --
-CREATE TABLE `results_view` (
-`docID` int(11)
-,`docTitle` varchar(255)
-,`docLink` varchar(255)
-);
+
+CREATE TABLE `results` (
+  `docRank` int(11) NOT NULL DEFAULT '1',
+  `docID` int(11) NOT NULL,
+  `docTitle` varchar(255) NOT NULL DEFAULT 'Non Available',
+  `docLinks` varchar(255) DEFAULT NULL,
+  `docHits` int(11) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -124,15 +127,6 @@ CREATE TABLE `tag_index` (
   `italicTag` int(11) DEFAULT '0',
   `contentTag` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Structure for view `results_view`
---
-DROP TABLE IF EXISTS `results_view`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `results_view`  AS  select distinct `doc_links`.`docID` AS `docID`,`doc_links`.`docTitle` AS `docTitle`,`doc_links`.`docLink` AS `docLink` from `doc_links` where `doc_links`.`docID` in (select `a0`.`docID` from (`pos_index` `a0` join `pos_index` `a1`) where ((`a0`.`term` = 'apples') and (`a1`.`term` = 'made') and (`a0`.`docID` = `a1`.`docID`) and `a0`.`docID` in (select `pos_index`.`docID` from `pos_index` group by `pos_index`.`docID` having (count(0) > 1)))) union select distinct `a`.`docID` AS `docID`,`b`.`docTitle` AS `docTitle`,`b`.`docLink` AS `docLink` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'apples') and (`a`.`docID` = `b`.`docID`)) union select distinct `a`.`docID` AS `docID`,`b`.`docTitle` AS `docTitle`,`b`.`docLink` AS `docLink` from (`pos_index` `a` join `doc_links` `b`) where ((`a`.`term` = 'made') and (`a`.`docID` = `b`.`docID`)) union select distinct `doc_links`.`docID` AS `docID`,`doc_links`.`docTitle` AS `docTitle`,`doc_links`.`docLink` AS `docLink` from `doc_links` where `doc_links`.`docID` in (select `a0`.`docID` from `pos_index` `a0` where ((`a0`.`term` = 'appl') and `a0`.`docID` in (select `pos_index`.`docID` from `pos_index` group by `pos_index`.`docID` having (count(0) > 1)))) order by `docID` ;
 
 --
 -- Indexes for dumped tables
@@ -157,12 +151,27 @@ ALTER TABLE `queries`
   ADD PRIMARY KEY (`query_text`);
 
 --
+-- Indexes for table `results`
+--
+ALTER TABLE `results`
+  ADD PRIMARY KEY (`docID`);
+
+--
 -- Indexes for table `tag_index`
 --
 ALTER TABLE `tag_index`
   ADD PRIMARY KEY (`term`,`docID`),
   ADD KEY `docID` (`docID`);
 
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `doc_links`
+--
+ALTER TABLE `doc_links`
+  MODIFY `docID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- Constraints for dumped tables
 --
