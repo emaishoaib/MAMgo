@@ -1,4 +1,3 @@
-package qp;
 
 import java.io.*;
 import java.net.*;
@@ -17,9 +16,6 @@ public class QueryProcessor
 	//If this is set to true then the user tried to search for a stopword
 	private static boolean singleSW = false;
 	
-	//This string contains the final string after processing
-	private static String finalQuery;
-	
 	//Function that takes the query input by user and processes it
 	public static boolean processQuery(String query)
 	{
@@ -36,7 +32,7 @@ public class QueryProcessor
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			Connection con = DriverManager.getConnection(url, user, password);
 
-			java.sql.PreparedStatement dv = con.prepareStatement("DELETE FROM results");
+			java.sql.PreparedStatement dv = con.prepareStatement("drop view if exists results_view");
 			dv.execute();
 			java.sql.PreparedStatement ps;
 
@@ -44,7 +40,6 @@ public class QueryProcessor
 			{
 				//Phrase searching
 
-				finalQuery = query;
 				query = query.substring(1, query.length() - 1);
 
 				words = new ArrayList<String>(Arrays.asList(query.split(" ")));
@@ -54,9 +49,7 @@ public class QueryProcessor
 				{
 					System.out.println("More than one word PS");
 
-					sqlST = "INSERT INTO results (docID, docTitle, docLink, docWordCount)"
-							+ " SELECT DISTINCT docID, docTitle, docLink, docWordCount"
-							+ " FROM doc_links WHERE docID IN (select a0.docID from ";
+					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -102,7 +95,7 @@ public class QueryProcessor
 				{
 					System.out.println("One word PS");
 
-					ps = con.prepareStatement("INSERT INTO results (docID, docTitle, docLink, docWordCount) SELECT DISTINCT a.docID, b.docTitle, b.docLink, b.docWordCount from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
+					ps = con.prepareStatement("create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID");
 					ps.setString(1, words.get(0));
 					ps.execute();
 				}
@@ -119,8 +112,8 @@ public class QueryProcessor
 				
 				wordsST = new ArrayList<String>(words);
 				String sqlST = "";
-				boolean KeepStopWords = true; //This flag checks if there are words that are not stop words
-				boolean AllStopWords = true; //This flag checks if the string consists of stop words only
+				boolean KeepStopWords = true;
+				boolean AllStopWords = true;
 				
 				if(words.size() > 1)
 				{
@@ -159,9 +152,7 @@ public class QueryProcessor
 						words = new ArrayList<String>(wordsST);
 					}
 
-					sqlST = "INSERT INTO results (docID, docTitle, docLink, docWordCount)"
-							+ " SELECT DISTINCT docID, docTitle, docLink, docWordCount"
-							+ " FROM doc_links WHERE docID IN (select a0.docID from ";
+					sqlST = "create view results_view as select distinct * from doc_links where docID in (select a0.docID from ";
 
 					for(int i = 0; i < words.size() - 1; i++)
 					{
@@ -183,15 +174,10 @@ public class QueryProcessor
 					}
 
 					sqlST = sqlST + "a0.docID in (select docID from pos_index group by docID having count(*) > 1)) ";
-					
-					for(int i = 0; i < words.size(); i++)
-					{
-						sqlST = sqlST + "UNION SELECT DISTINCT a.docID, b.docTitle, b.docLink, b.docWordCount from pos_index a, doc_links b where a.term = ? and a.docID = b.docID ";
-					}
-					
+
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + "UNION SELECT DISTINCT docID, docTitle, docLink, docWordCount from doc_links where docID in (select a0.docID from ";
+						sqlST = sqlST + "union select distinct * from doc_links where docID in (select a0.docID from ";
 
 						for(int i = 0; i < stems.size() - 1; i++)
 						{
@@ -214,7 +200,7 @@ public class QueryProcessor
 
 						sqlST = sqlST + "a0.docID in (select docID from pos_index group by docID having count(*) > 1)) ";
 					}
-					
+
 					sqlST = sqlST + "order by docID";
 
 					ps = con.prepareStatement(sqlST);
@@ -223,15 +209,10 @@ public class QueryProcessor
 					{
 						ps.setString(i + 1, words.get(i));
 					}
-					
-					for(int i = 0; i < words.size(); i++)
-					{
-						ps.setString(i + words.size() + 1, words.get(i));
-					}
 
 					for(int i = 0; i < stems.size(); i++)
 					{
-						ps.setString(i + 2 * words.size() + 1, stems.get(i));
+						ps.setString(i + words.size() + 1, stems.get(i));
 					}
 
 					ps.execute();
@@ -257,12 +238,11 @@ public class QueryProcessor
 						stems.add(stemmed);	
 					}
 
-					sqlST = "INSERT INTO results (docID, docTitle, docLink, docWordCount)"
-							+ " SELECT DISTINCT a.docID, b.docTitle, b.docLink, b.docWordCount from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+					sqlST = "create view results_view as select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 
 					if(stems.size() > 0)
 					{
-						sqlST = sqlST + " union select distinct a.docID, b.docTitle, b.docLink, b.docWordCount from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
+						sqlST = sqlST + " union select distinct a.docID, b.docLink, b.docTitle from pos_index a, doc_links b where a.term = ? and a.docID = b.docID";
 					}
 
 					sqlST = sqlST + " order by docID";
@@ -274,15 +254,13 @@ public class QueryProcessor
 					}
 					ps.execute();
 				}
-				
-				finalQuery = words.toString();
 			}
 
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
 	}
 	
@@ -351,23 +329,10 @@ public class QueryProcessor
 			System.out.println("User query recieved:");
 			System.out.println(query);
 			
-			boolean result = false;
-			String queryResponse = "";
-			
-			//Sending user query to processQuery method for processing and storing result set in 'results_view'
+			//Sending user query to processQuery method for processing and storing results in 'results_view'
+			boolean result;
 			if(query != null)
 				result = processQuery(query);
-			
-			//Checking if there was a result in the first place...
-			//...if positive, then store query after processing (before stemming)
-			if (result == true)
-			{
-				queryResponse = finalQuery;
-				queryResponse = queryResponse + "\n";
-			}
-			//...if negative, then query was not processed thus store '-1' as an indication
-			else
-				queryResponse = "-1\n";
 
 			// Listen to port 1236
 			try
@@ -384,7 +349,7 @@ public class QueryProcessor
 			try
 			{
 				PrintStream ps = new PrintStream(socket_wr.getOutputStream());
-				ps.print(queryResponse);					
+				ps.print("Query received\n");					
 			}
 			catch (Exception e)
 			{

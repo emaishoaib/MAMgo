@@ -64,9 +64,6 @@
                         if (isset($_GET['query']))
                         {
                             $query = $_GET['query'];
-                            
-                            // Escaping any rogue string chars e.g. double quotations, thus displaying it when 'echo'
-                            $display = htmlspecialchars($query, ENT_QUOTES, 'UTF-8');
                         }
                     ?>
                     
@@ -74,7 +71,8 @@
                     <form id="search_bar" method = "post">
                         
                         <!--Class of text is set as so based on Twitter's typeahead.js. Value is set as so in order to display $query-->
-                        <input type="text" class ="typeahead tt-query" name="searchBar" autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $display?>">
+                        <input type="text" class ="typeahead tt-query" name="searchBar" 
+                               autocomplete="off" spellcheck="false" placeholder = "Search..." value="<?php echo $query?>">
 
                         <!--alt="submit" makes the png icon like a submit button, submitting the form and thus setting the POST-->
                         <input type="image" src="../img/search-icon.png" class="search_btn" alt="submit">
@@ -119,7 +117,7 @@
                         exit;
                     }
                      
-                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test. NOTE this test parameter can even be added through the search bar by typing the query, followed by '&test' with no spaces precedint '$test'
+                    // Condition for the sake of testing interface without actual search. If there is 'test' parameter in the URL, then no actual search, just test
                     if (isset($_GET['test']))
                     {
                         // test_ui() is defined in 'controller.php'
@@ -132,8 +130,10 @@
                         // Sending the query to Java for processing
                         send_query($query);
                                
-                        // Receiving response from Java; this response is the query after processing, but before stemming
-                        $respQuery = receive_response();                            
+                        // Receiving response from Java
+                        $resp = receive_response();
+                               
+                        //echo $resp;
                     }
                 ?>
                     
@@ -144,31 +144,6 @@
             <div id = "results">
                 
                 <?php
-
-                    // Checking if query was processed and results view created in the first place
-                    if ($respQuery == "-1\n")
-                    {
-                ?>
-                
-                <!--Message conveying query was not processed-->
-                <p>Query Not Processed</p>
-                
-                
-                <?php
-                        // If query not processed, then exit and don't continue running
-                        exit();
-                    }
-                    else
-                    {                        
-                        // Assigning this new query to the variable of the original query
-                        $query = $respQuery;
-                        
-                        // The string returned by Java takes the form of a string starting with '[', ending with ']' and each word separated with ',' thus we remove all
-                        $query = str_replace(array('[', ',', ']', '\n'), '' , $query);
-                        
-                        // When performing strlen() on $query, there seems to be a hidden character that results from port communication, thus remove hidden characters
-                        $query = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $query);
-                    }
                 
                     // Getting the results
                     $result_records = get_results();
@@ -179,7 +154,7 @@
                 ?>
                 
                 <!--Message conveying no searh results found-->
-                <p>No Results Found</p>
+                <p>No results found</p>
                 
                 <?php
                     }
@@ -223,7 +198,7 @@
                                     // Getting the description snippet, by sending to 'get_snippet()':
                                     //      - The current record's ID with the value stored in the current row's docID
                                     //      - The query entered by the user found in the URL
-                                    $snippet = get_snippet($row['docID'], $query);
+                                    $snippet = get_snippet($row['docID'], $_GET['query']);
                                                                 
                                     // Echoing the description snippet
                                     echo $snippet;
@@ -236,10 +211,14 @@
                     </ul>
                 
                 <?php
-                            }
+                        }
                 ?>
                 
                 </ul>
+                
+                <?php
+                    }
+                ?>
                 
                 <!--Section to contain the pages links (pagination)-->
                 <div id="pages">
@@ -290,10 +269,6 @@
                     
                 </div>
                 
-                <?php
-                    }
-                ?>
-  
             </div>
             
         </div>
