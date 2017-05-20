@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2017 at 05:35 AM
+-- Generation Time: May 20, 2017 at 06:37 PM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -23,6 +23,17 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `doc_hits`
+--
+
+CREATE TABLE `doc_hits` (
+  `docLink` varchar(600) NOT NULL,
+  `docHits` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `doc_links`
 --
 
@@ -30,7 +41,6 @@ CREATE TABLE `doc_links` (
   `docID` int(11) NOT NULL,
   `docTitle` varchar(255) DEFAULT '[In Progress]',
   `docLink` varchar(255) NOT NULL,
-  `docHits` int(11) NOT NULL DEFAULT '1',
   `docWordCount` int(11) NOT NULL DEFAULT '0',
   `isIndexed` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -39,43 +49,28 @@ CREATE TABLE `doc_links` (
 -- Dumping data for table `doc_links`
 --
 
-INSERT INTO `doc_links` (`docID`, `docTitle`, `docLink`, `docHits`, `docWordCount`, `isIndexed`) VALUES
-(0, 'Food Kingdom: Apples', 'www.apples.com', 1, 0, 1),
-(1, 'Food Kingdom: Bananas', 'www.bananas.com', 1, 0, 1),
-(2, 'Food Kingdom: Pineapples', 'www.pineapples.com', 1, 0, 1),
-(3, 'Food Kingdom: Kiwis', 'www.kiwis.com', 1, 0, 1),
-(4, 'Food Kingdom: Watermelons', 'www.watermelons.com', 1, 0, 1),
-(5, 'Food Kingdom: Mangos', 'www.mangos.com', 1, 0, 1),
-(6, 'Food Kingdom: Oranges', 'www.oranges.com', 1, 0, 1),
-(7, 'Food Kingdom: Tangerines', 'www.tangerines.com', 1, 0, 1),
-(8, 'Food Kingdom: Peaches', 'www.peaches.com', 1, 0, 1),
-(9, 'Food Kingdom: Peas', 'www.peas.com', 1, 0, 1),
-(10, 'Food Kingdom: Carrots', 'www.carrots.com', 1, 0, 1),
-(11, 'Food Kingdom: Olives', 'www.olives.com', 1, 0, 1),
-(12, 'Food Kingdom: Candies', 'www.candies.com', 1, 0, 1),
-(13, 'Food Kingdom: Cornflakes', 'www.cornflakes.com', 1, 0, 1),
-(14, 'Food Kingdom: Tomatoes', 'www.tomatoes.com', 1, 0, 1),
-(15, 'Food Kingdom: Rice', 'www.rice.com', 1, 0, 1),
-(16, 'Food Kingdom: Fried Food', 'www.fried-food.com', 1, 0, 1),
-(17, 'Food Kingdom: Doughnuts', 'www.doughnuts.com', 1, 0, 1),
-(18, 'Food Kingdom: Icecream', 'www.icecream.com', 1, 0, 1),
-(19, 'Food Kingdom: Honey', 'www.honey.com', 1, 0, 1),
-(20, 'Food Kingdom: Chocolates', 'www.chocolates.com', 1, 0, 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `doc_links_new`
---
-
-CREATE TABLE `doc_links_new` (
-  `docID` int(11) NOT NULL,
-  `docTitle` varchar(255) DEFAULT 'None Available',
-  `docLink` varchar(255) DEFAULT NULL,
-  `docHits` int(11) NOT NULL DEFAULT '1',
-  `docWordCount` int(11) NOT NULL DEFAULT '0',
-  `isIndexed` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+INSERT INTO `doc_links` (`docID`, `docTitle`, `docLink`, `docWordCount`, `isIndexed`) VALUES
+(0, 'Food Kingdom: Apples', 'www.apples.com', 0, 1),
+(1, 'Food Kingdom: Bananas', 'www.bananas.com', 0, 1),
+(2, 'Food Kingdom: Pineapples', 'www.pineapples.com', 0, 1),
+(3, 'Food Kingdom: Kiwis', 'www.kiwis.com', 0, 1),
+(4, 'Food Kingdom: Watermelons', 'www.watermelons.com', 0, 1),
+(5, 'Food Kingdom: Mangos', 'www.mangos.com', 0, 1),
+(6, 'Food Kingdom: Oranges', 'www.oranges.com', 0, 1),
+(7, 'Food Kingdom: Tangerines', 'www.tangerines.com', 0, 1),
+(8, 'Food Kingdom: Peaches', 'www.peaches.com', 0, 1),
+(9, 'Food Kingdom: Peas', 'www.peas.com', 0, 1),
+(10, 'Food Kingdom: Carrots', 'www.carrots.com', 0, 1),
+(11, 'Food Kingdom: Olives', 'www.olives.com', 0, 1),
+(12, 'Food Kingdom: Candies', 'www.candies.com', 0, 1),
+(13, 'Food Kingdom: Cornflakes', 'www.cornflakes.com', 0, 1),
+(14, 'Food Kingdom: Tomatoes', 'www.tomatoes.com', 0, 1),
+(15, 'Food Kingdom: Rice', 'www.rice.com', 0, 1),
+(16, 'Food Kingdom: Fried Food', 'www.fried-food.com', 0, 1),
+(17, 'Food Kingdom: Doughnuts', 'www.doughnuts.com', 0, 1),
+(18, 'Food Kingdom: Icecream', 'www.icecream.com', 0, 1),
+(19, 'Food Kingdom: Honey', 'www.honey.com', 0, 1),
+(20, 'Food Kingdom: Chocolates', 'www.chocolates.com', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -4012,15 +4007,15 @@ INSERT INTO `tag_index` (`term`, `docID`, `titleTag`, `hTag`, `boldTag`, `italic
 --
 
 --
+-- Indexes for table `doc_hits`
+--
+ALTER TABLE `doc_hits`
+  ADD PRIMARY KEY (`docLink`);
+
+--
 -- Indexes for table `doc_links`
 --
 ALTER TABLE `doc_links`
-  ADD PRIMARY KEY (`docID`);
-
---
--- Indexes for table `doc_links_new`
---
-ALTER TABLE `doc_links_new`
   ADD PRIMARY KEY (`docID`);
 
 --
@@ -4048,15 +4043,6 @@ ALTER TABLE `tag_index`
   ADD PRIMARY KEY (`term`,`docID`),
   ADD KEY `docID` (`docID`);
 
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `doc_links_new`
---
-ALTER TABLE `doc_links_new`
-  MODIFY `docID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- Constraints for dumped tables
 --
