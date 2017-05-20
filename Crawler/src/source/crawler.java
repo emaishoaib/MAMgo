@@ -1,3 +1,5 @@
+package source;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,7 +70,7 @@ public class crawler implements Runnable
 			con = DriverManager.getConnection(url, user, password);
 			
 		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 			System.out.println("Sql Exception");
 		}
 	}
