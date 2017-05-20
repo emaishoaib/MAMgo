@@ -112,7 +112,7 @@ function get_results()
     global $connection;
     
     // The SQL query to execute
-    $sql = "SELECT * FROM results_view";
+    $sql = "SELECT * FROM results";
     
     // Executing the SQL query and storing the result as a PDOStatement in $result
     $result = $connection->query($sql);
@@ -255,11 +255,11 @@ function get_snippet($id, $query)
                 // If $snippet_part is not empty, a snippet text was found for the current term in the query word, and thus concatenate...
                 if ($snippet_part != "")
                     // ...$snippet_part to $snippet, followed by "//" to indicate separation between each term's text snippet
-                    $snippet = $snippet . $snippet_part . "//";
+                    $snippet = $snippet . $snippet_part . "// ";
             }
             
             // Trimming out the last '//'
-            $snippet = rtrim($snippet, '//');
+            $snippet = rtrim($snippet, '// ');
         }
     }
     
