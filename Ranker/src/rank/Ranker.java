@@ -145,7 +145,7 @@ public class Ranker
 	private static boolean rankDocs(String queryReceived)
 	{
 		String query = queryReceived;
-		String url = "jdbc:mysql://localhost:3306/";
+		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
 		String user = "root";
 		String password = "";
 		
@@ -155,19 +155,28 @@ public class Ranker
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		Connection con = DriverManager.getConnection(url, user, password);
 		
-		Statement stt = con.createStatement();
-		stt.execute("USE search");
+		Statement sttRes = con.createStatement();
+		Statement sttCount = con.createStatement();
+		Statement sttTotal = con.createStatement();
+		Statement sttTag = con.createStatement();
+		Statement sttSend = con.createStatement();
+		Statement sttTemp = con.createStatement();
 		
 		ResultSet res;
 		ResultSet Count;
 		ResultSet Total;
 		
 		//Reading last recorded docID in database
-		res = stt.executeQuery("SELECT docID FROM results");
-		Count = stt.executeQuery("SELECT COUNT(docID) FROM results");
-		Total = stt.executeQuery("SELECT COUNT(docID) FROM doc_links");
+		res = sttRes.executeQuery("SELECT docID FROM results");
+		Count = sttCount.executeQuery("SELECT COUNT(docID) FROM results");
+		Total = sttTotal.executeQuery("SELECT COUNT(docID) FROM doc_links");
+		
+		Count.next();
+		Total.next();
+		
 		int countRow = Count.getInt(0);
 		int TCount = Total.getInt(0);
+		
 		int type=0;
 		List <String> queryArray = null;
 		List <String> docString = null;
@@ -202,20 +211,20 @@ public class Ranker
 		double[][][] my_results_tf_phrase = new double[countRow][1][3];
 			
 				
+		res.next();
+		
 		//while (res.next())
 			for(int i = 0; i < countRow; i++)
 			{
 				ResultSet tag;
-				tag = stt.executeQuery("SELECT * FROM tag_index WHERE docID=" +res.getInt("docID"));
-				res.next();
-				if(type == 1)
-					
+				tag = sttTag.executeQuery("SELECT * FROM tag_index WHERE docID=" +res.getInt("docID"));
+
+				if(type == 1)	
 				{
 					
 					double[][] temp = new double[queryArray.size()][2];
 					temp = tf_idf( tag , queryArray );
-					my_results_tf[i]=temp;
-						
+					my_results_tf[i]=temp;	
 				}
 				
 				else if(type==2)
@@ -223,19 +232,14 @@ public class Ranker
 					docString=phrase(res);
 					double[][] temp = new double[1][2];
 					temp = tf_idf_2( docString , query );
-					my_results_tf_phrase[i]=temp;
-						
-						
+					my_results_tf_phrase[i]=temp;		
 				}
 				
-				
-				
+				res.next();
 			}
 			
-			
-				if(type == 1)
-					
-				{
+			if(type == 1)
+			{
 					for(int i = 0; i <  queryArray.size(); i++)
 					{
 						double[] idf= new double[queryArray.size()];
@@ -263,7 +267,8 @@ public class Ranker
 						}	
 						
 					}
-					ResultSet send=stt.executeQuery("SELECT docID FROM results");
+					
+					ResultSet send = sttSend.executeQuery("SELECT docID FROM results");
 					for(int i = 0; i <  countRow; i++)
 					{
 						
@@ -273,12 +278,9 @@ public class Ranker
 						{
 							total = total + my_results_tf[i][j][2];	
 						}	
-						stt.executeQuery("UPDATE results SET docRank = " + total + " WHERE docID = " + send.getInt("docID"));
+						sttTemp.executeQuery("UPDATE results SET docRank = " + total + " WHERE docID = " + send.getInt("docID"));
 						send.next();
 					}
-					
-					
-					
 				}
 				
 				else if(type==2)
@@ -301,12 +303,12 @@ public class Ranker
 						}
 					}
 					
-					ResultSet send=stt.executeQuery("SELECT docID FROM results");
+					ResultSet send=sttSend.executeQuery("SELECT docID FROM results");
 					for(int i = 0; i <  countRow; i++)
 					{
 						
 						double total = my_results_tf[i][0][2];
-						stt.executeQuery("UPDATE results SET docRank = " + total + " WHERE docID = " + send.getInt("docID"));
+						sttTemp.executeQuery("UPDATE results SET docRank = " + total + " WHERE docID = " + send.getInt("docID"));
 						send.next();
 					}
 					
