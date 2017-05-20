@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 20, 2017 at 12:13 AM
+-- Generation Time: May 20, 2017 at 03:22 AM
 -- Server version: 10.1.19-MariaDB
 -- PHP Version: 5.6.28
 
@@ -27,6 +27,21 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `doc_links` (
+  `docID` int(11) NOT NULL,
+  `docTitle` varchar(255) DEFAULT '[In Progress]',
+  `docLink` varchar(255) NOT NULL,
+  `docHits` int(11) NOT NULL DEFAULT '1',
+  `docWordCount` int(11) NOT NULL DEFAULT '0',
+  `isIndexed` int(11) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `doc_links_new`
+--
+
+CREATE TABLE `doc_links_new` (
   `docID` int(11) NOT NULL,
   `docTitle` varchar(255) DEFAULT 'None Available',
   `docLink` varchar(255) DEFAULT NULL,
@@ -64,30 +79,8 @@ CREATE TABLE `queries` (
 --
 
 INSERT INTO `queries` (`query_text`, `query_count`) VALUES
-('"animals are multicellular"', 6),
-('"apples made by"', 9),
-('"apples made of"', 98),
-('"apples made"', 18),
-('"apples"', 3),
-('"bananas made by"', 3),
-('"bananas made of"', 1),
-('"bananas made"', 3),
-('"From Wikipedia"', 4),
-('"made of"', 6),
-('"the free encyclopedia"', 3),
-('animal', 83),
-('animal animation', 63),
-('animal cell', 1),
-('animals', 3),
-('animation', 7),
-('apples', 65),
-('apples made', 72),
 ('Are rhinos really extinct?', 13),
-('bananas', 58),
-('food', 3),
 ('How much is Bill Gate''s salary?', 2),
-('made', 3),
-('policy', 145),
 ('Where is Bill Gates from?', 5),
 ('Where is Jack?', 1),
 ('Where is Jennifer Lawrence from?', 2),
@@ -109,7 +102,7 @@ CREATE TABLE `results` (
   `docRank` int(11) NOT NULL DEFAULT '1',
   `docID` int(11) NOT NULL,
   `docTitle` varchar(255) NOT NULL DEFAULT 'Non Available',
-  `docLinks` varchar(255) DEFAULT NULL,
+  `docLink` varchar(255) DEFAULT NULL,
   `docHits` int(11) NOT NULL DEFAULT '1',
   `docWordCount` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -138,6 +131,12 @@ CREATE TABLE `tag_index` (
 -- Indexes for table `doc_links`
 --
 ALTER TABLE `doc_links`
+  ADD PRIMARY KEY (`docID`);
+
+--
+-- Indexes for table `doc_links_new`
+--
+ALTER TABLE `doc_links_new`
   ADD PRIMARY KEY (`docID`);
 
 --
@@ -170,9 +169,9 @@ ALTER TABLE `tag_index`
 --
 
 --
--- AUTO_INCREMENT for table `doc_links`
+-- AUTO_INCREMENT for table `doc_links_new`
 --
-ALTER TABLE `doc_links`
+ALTER TABLE `doc_links_new`
   MODIFY `docID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- Constraints for dumped tables
