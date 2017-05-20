@@ -19,8 +19,11 @@ import org.apache.commons.lang3.*;
 import org.tartarus.snowball.ext.*;
 
 
-public class Indexer
+public class IndexerBackup
 {	
+	//Declaring important variables
+	private static String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\state.txt";
+	private static String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\links.txt";
 	private static String htmls_folder = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\HTMLs\\";
 	
 	private static String url = "jdbc:mysql://localhost:3306/";
@@ -82,6 +85,27 @@ public class Indexer
 	
 	public static void main(String[] args) 
 	{	
+		//Reading current state number
+		String fileText;
+		int stateNum = 0;
+		try
+		{
+			BufferedReader stateReader = new BufferedReader(new FileReader(state_txt));
+			fileText = stateReader.readLine();
+			stateNum = Integer.parseInt(fileText);
+			
+			stateReader.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			System.out.println("File not found!");
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
 		//Connecting and performing operations on database
 		try
 		{
@@ -92,48 +116,52 @@ public class Indexer
 			//Select database 'search'
 			Statement stt = con.createStatement();
 			stt.execute("USE search");
-			ResultSet res = null;
-			ResultSet resRec = null;
+			ResultSet res;
 			
-			//Checking if there are any pages that need to be indexed
-			resRec = stt.executeQuery("SELECT * FROM doc_links WHERE isIndexed = 0");
-			if (!resRec.next())
+			//Reading last recorded docID in database
+			int lastID = -1;
+			res = stt.executeQuery("SELECT * FROM doc_links");
+			if (res.next())
+			{
+				res = stt.executeQuery("SELECT MAX(docID) AS docID FROM doc_links");
+				res.next();
+				lastID = res.getInt("docID");	
+			}
+			
+			//If current state number is equal to last docID + 1, then no new pages to index
+			if (stateNum - lastID == 1)
 			{
 				System.out.println("No pages to index!");
-				
-				//Putting the pointer back to where it was, just in case
-				resRec.beforeFirst();
-				
 				return;
 			}
 			
-			//Shifting pointer backwards one step, to start from true next
-			resRec.beforeFirst();
-			
-			//Iterate over the entire result set of docs that haven't been indexed
-			while (resRec.next())
-			{				
-				//Get the value of current record's docID column
-				int currID = resRec.getInt("docID");
+			//While current state number is not equal to last docID + 1, then keep indexing
+			while (stateNum - lastID != 1)
+			{
+				//Next doc ID to be indexed
+				lastID++;
 				
-				//Setting the result record as being indexed
-				stt.execute("UPDATE doc_links"
-						+ " SET isIndexed = 1"
-						+ " WHERE docID = " + currID);
+				//Selecting link, respective of doc ID to be indexed
+	            BufferedReader linksReader = new BufferedReader(new FileReader(links_txt));
+				String link = null;
+				for (int i = -1; i < lastID; i++)
+				{
+					link = linksReader.readLine();
+				}				
+				linksReader.close();
 				
 				//Parsing the doc's corresponding HTML file
-				File file = new File(htmls_folder + currID + ".html");
+				File file = new File(htmls_folder + lastID + ".html");
 	            Document doc = Jsoup.parse(file, "UTF-8");
 	            
 				//Extracting the first <title> tag from the HTML doc
 				Element titleFirst = doc.select("title").first();
 				String titleFirstStr = titleFirst.text();
 				
-				//Storing the doc's title
-				stt.execute("UPDATE doc_links"
-						+ " SET docTitle = '" + titleFirstStr + "'"
-						+ " WHERE docID = " + currID);
-				
+				//Storing the doc's ID, title and link in database
+				stt.execute("INSERT INTO doc_links (docID, docTitle, docLink)"
+						+ " VALUES (" + lastID + ", '" + titleFirstStr + "', '" + link + "')");
+
 				//NOTE: Elements is a list of Element objects
 
 	            //Extracting the desired tags from the parsed HTML doc
@@ -202,10 +230,8 @@ public class Indexer
 	            	}
 	            	
 	            }
+	                 
 
-	            //Getting total count of words in document
-	            int wordCount = hArr.length + contentArr.length;
-	            
 	            //Declaring variables for counting, stemming and indexing
 	            PorterStemmer portStem = new PorterStemmer();
 	            String term = "";
@@ -231,7 +257,7 @@ public class Indexer
 	                termStem = portStem.getCurrent();
 	                
 	                //Indexing term
-	                indexTerm(stt, res, "titleTag", currID, term, termStem);
+	                indexTerm(stt, res, "titleTag", lastID, term, termStem);
 	                
 	                //Indexing position done in content as this tag is included there  
 	            }
@@ -252,7 +278,7 @@ public class Indexer
 	                termStem = portStem.getCurrent();
 	                
 	                //Indexing term
-	                indexTerm(stt, res, "hTag", currID, term, termStem);
+	                indexTerm(stt, res, "hTag", lastID, term, termStem);
 	                
 	                //Indexing position done in content as this tag is included there
 	            }
@@ -273,7 +299,7 @@ public class Indexer
 	                termStem = portStem.getCurrent();
 	                
 	                //Indexing term
-	                indexTerm(stt, res, "boldTag", currID, term, termStem);
+	                indexTerm(stt, res, "boldTag", lastID, term, termStem);
 	                
 	                //Indexing position done in content as this tag is included there
 	            }
@@ -294,7 +320,7 @@ public class Indexer
 	                termStem = portStem.getCurrent();
 	                
 	                //Indexing term
-	                indexTerm(stt, res, "italicTag", currID, term, termStem);
+	                indexTerm(stt, res, "italicTag", lastID, term, termStem);
 	                
 	                //Indexing position done in content as this tag is included there
 	            }
@@ -328,7 +354,7 @@ public class Indexer
 		                termStem = portStem.getCurrent();
 
 		                //Indexing term
-		                indexTerm(stt, res, "contentTag", currID, term, termStem); 
+		                indexTerm(stt, res, "contentTag", lastID, term, termStem); 
 		                
 		                //Tag number is the current index 'i'
 		                tagNum = i;	
@@ -337,11 +363,11 @@ public class Indexer
 		                pos = j;
 		                
 		                //Indexing position
-		                indexPos(stt, currID, term, termStem, tagNum, pos);
+		                indexPos(stt, lastID, term, termStem, tagNum, pos);
 	            	}
 	            }
 	            
-	            System.out.println("Indexed document # " + currID);
+	            System.out.println("Indexed document # " + lastID);
 			}
 			
 			System.out.println("Indexing complete!");
