@@ -105,6 +105,16 @@ function add_query()
     
 }
 
+// Ranking the HTML docs of the result set in tables 'result'
+function rank_results($query, $sendPort, $receivePort)
+{
+    // Sending string to Ranker.java over port 1245
+    send_string_port($query, $sendPort);
+    
+    // Receiving string from Ranker.java over port 1246
+    receive_string_port($receivePort);
+}
+
 // Getting the search results as outputted by query processor from VIEW 'results_view'
 function get_results()
 {

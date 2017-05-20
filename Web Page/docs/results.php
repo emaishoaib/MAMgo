@@ -124,6 +124,9 @@
                     {
                         // test_ui() is defined in 'controller.php'
                         test_ui();
+                        
+                        // Setting query value in URL to $respQuery
+                        $respQuery = $_GET['query'];
                     }
                                
                     // If there is no 'test' parameter, then actual search
@@ -169,6 +172,9 @@
                         // When performing strlen() on $query, there seems to be a hidden character that results from port communication, thus remove hidden characters
                         $query = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $query);
                     }
+                
+                    // Ranking the result set in table 'results'
+                    rank_results($query, 1245, 1246);
                 
                     // Getting the results
                     $result_records = get_results();
