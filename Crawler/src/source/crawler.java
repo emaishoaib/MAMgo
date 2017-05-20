@@ -6,6 +6,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.io.*;
 import java.net.*;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -30,34 +33,57 @@ import source.SimpleRobotRules.RobotRulesMode;
 @SuppressWarnings("unused")
 public class crawler implements Runnable
 {
-	static private String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\state.txt";
-	static private String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\links.txt";
-	static private String htmls_folder = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\_crawler\\HTMLs\\";
+	static private String state_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\state.txt";
+	static private String links_txt = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\links.txt";
+	static private String htmls_folder = "C:\\xampp\\htdocs\\MAMgo\\_crawler\\HTMLs\\";
 	
 	private int threads;
 	private int maxDepth;
 	private Set<String> visited;
 	private ArrayList<String> unvisited;
+	private ArrayList<String> allLinks;
 	private int state;
 	private long crawlDelay = 0;
 	private long lastVisit = 0;
 	private String oldURL = "";
+	private static java.sql.Connection con;
 	private static final String USER_AGENT =
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
 	Object lock = new Object();
 	
-	public crawler(Set<String> visited, ArrayList<String> unvisited, int threads, int maxDepth, int state)
+	public crawler(Set<String> visited, ArrayList<String> unvisited, ArrayList<String> allLinks, int threads, int maxDepth, int state)
 	{
 		this.threads = threads > 0 ? threads : 1;
 		this.maxDepth = maxDepth;
 		this.visited = visited;
+		this.allLinks = allLinks;
 		this.unvisited = unvisited;
 		this.state = state;
+		
+		String url = "jdbc:mysql://localhost:3306/search?useSSL=false";
+		String user = "root";
+		String password = "";
+		
+		try {
+			
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			con = DriverManager.getConnection(url, user, password);
+			
+		} catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("Sql Exception");
+		}
 	}
 		
+	@SuppressWarnings("resource")
 	private synchronized String nextUrl()
 	{
 	      String nextUrl = "";
+	      
+	      java.sql.PreparedStatement counts;
+    	  ResultSet tempSet;
+    	  int testMe;
+    	  int indexTemp;
 	      
 	      do
 	      {
@@ -70,10 +96,49 @@ public class crawler implements Runnable
 	      while(visited.contains(nextUrl));
 	    	  
 	      if(!nextUrl.equals(""))
+	      {
 	    	  visited.add(nextUrl);
-          
+	    	  
+	    	  saveState(state);
+	    	  
+	    	  indexTemp = allLinks.indexOf(nextUrl);
+
+	    	  if(indexTemp > -1)
+				{
+					try {
+						
+						counts = con.prepareStatement("select * from doc_hits where docLink = ?");
+						counts.setString(1, nextUrl);
+						tempSet = counts.executeQuery();
+						
+						tempSet.next();
+						
+						if(tempSet.getRow() == 0)
+						{
+							counts = con.prepareStatement("INSERT INTO doc_hits (`docLink`,`docHits`) VALUES(?, ?)");
+							counts.setString(1, nextUrl);
+							counts.setInt(2, 1);
+							counts.execute();
+						}
+						else
+						{
+							counts = con.prepareStatement("UPDATE doc_hits SET `docHits` = ? WHERE `docLink` = ?");
+							testMe = tempSet.getInt(2) + 1;
+							counts.setInt(1, tempSet.getInt(2) + 1);
+							counts.setString(2, nextUrl);
+							counts.execute();
+						}
+						
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}
+
+	      }
+
 	      return nextUrl;
 	}
+	
 	
 	@Override
 	public void run() 
@@ -125,10 +190,13 @@ public class crawler implements Runnable
 	
 	private boolean checkRobots(String URL) throws ClientProtocolException, IOException
 	{
+		String temp;
+		
 		URL urlObj = new URL(URL);
+
 		String hostId = urlObj.getProtocol() + "://" + urlObj.getHost() + (urlObj.getPort() > -1 ? ":" + urlObj.getPort() : "");
 		
-		if(!urlObj.getHost().equals(oldURL))
+		if(!urlObj.getHost().equals(oldURL) && !oldURL.equals(""))
 		{
 			lastVisit = System.currentTimeMillis();
 		}
@@ -170,6 +238,7 @@ public class crawler implements Runnable
 		return rules.isAllowed(URL);
 	}
 	
+	@SuppressWarnings("resource")
 	private void extractLinks(String URL, int depth)
 	{
 		Connection connection;
@@ -177,6 +246,14 @@ public class crawler implements Runnable
 		Elements links;
 		String l;
 		int end;
+		
+		java.sql.PreparedStatement counts;
+		ResultSet tempSet;
+		int testMe;
+		int indexTemp;
+		
+		int ind1;
+		int ind2;
 		
 		if(depth <= maxDepth)
 		{
@@ -201,6 +278,14 @@ public class crawler implements Runnable
 				else
 				{
 					System.out.println("**Failure** " + URL + " might be down.");
+					ind1 = unvisited.indexOf(URL);
+					ind2 = unvisited.indexOf(URL);
+					
+					if(ind1 > -1)
+						unvisited.remove(ind1);
+					if(ind2 > -1)
+						allLinks.remove(ind2);
+					
 					saveState(state);
 					URL = nextUrl();
 					if(!URL.equals(""))
@@ -210,11 +295,20 @@ public class crawler implements Runnable
 					else
 					{
 						return;
-					}				}
+					}				
+				}
 				
 				if(!connection.response().contentType().contains("text/html"))
 				{
 					System.out.println("**Failure** Retrieved something other than HTML");
+					ind1 = unvisited.indexOf(URL);
+					ind2 = unvisited.indexOf(URL);
+					
+					if(ind1 > -1)
+						unvisited.remove(ind1);
+					if(ind2 > -1)
+						allLinks.remove(ind2);
+					
 					saveState(state);
 					URL = nextUrl();
 					if(!URL.equals(""))
@@ -224,7 +318,8 @@ public class crawler implements Runnable
 					else
 					{
 						return;
-					}				}
+					}				
+				}
 				
 				links = doc.select("a[href]");
 				
@@ -233,7 +328,8 @@ public class crawler implements Runnable
 					file.write(doc.toString());
 
 				} catch (IOException e) {
-					e.printStackTrace();
+//					e.printStackTrace();
+					System.out.println("The specified path doesn't exist.");
 				}
 				
 				state += threads;
@@ -244,27 +340,80 @@ public class crawler implements Runnable
 				{
 					l = link.attr("abs:href");
 					end = l.indexOf('#') - 1 > 0 ? l.indexOf('#') : l.length();
+					
+					if(l.endsWith("/"))
+						end = l.lastIndexOf('/') - 1 > 0 ? l.lastIndexOf('/') : l.length();
+					
 					l = l.substring(0, end);
-
-					if(l != "" && !visited.contains(l.replaceAll("https", "http")) && !visited.contains(l.replaceAll("http", "https")) && !visited.contains(l))
+					
+					if(l != "")
 					{
-						if(addUnvisited(l))
+						if(!visited.contains(l.replaceAll("https", "http")) && !visited.contains(l.replaceAll("http", "https")) && !visited.contains(l))
 						{
-							URL = nextUrl();
-							if(!URL.equals(""))
+							if(addUnvisited(l))
 							{
-								extractLinks(URL, depth);
+								if(!allLinks.contains(l))
+									allLinks.add(l);
+								
+								URL = nextUrl();
+								if(!URL.equals(""))
+								{
+									extractLinks(URL, depth);
+								}
+								else
+								{
+									System.out.println("**Failure** " + URL + " was visited before");
+								}
 							}
-							else
+						}
+						else
+						{
+							indexTemp = allLinks.indexOf(l);
+							
+							if(indexTemp > -1)
 							{
-								System.out.println("**Failure** " + URL + " was visited before");
+								try {
+									
+									counts = con.prepareStatement("select * from doc_hits where docLink = ?");
+									counts.setString(1, l);
+									tempSet = counts.executeQuery();
+									
+									tempSet.next();
+									
+									if(tempSet.getRow() == 0)
+									{
+										counts = con.prepareStatement("INSERT INTO doc_hits (`docLink`,`docHits`) VALUES(?, ?)");
+										counts.setString(1, l);
+										counts.setInt(2, 1);
+										counts.execute();
+									}
+									else
+									{
+										counts = con.prepareStatement("UPDATE doc_hits SET `docHits` = ? WHERE `docLink` = ?");
+										testMe = tempSet.getInt(2) + 1;
+										counts.setInt(1, tempSet.getInt(2) + 1);
+										counts.setString(2, l);
+										counts.execute();
+									}
+									
+								} catch (SQLException e) {
+									e.printStackTrace();
+								}
 							}
 						}
 					}
 				}
 
 			} catch (IOException e) {
-				System.out.println("Error connecting to: " + URL + "\n");
+				System.out.println("Error connecting to link\n");
+				ind1 = unvisited.indexOf(URL);
+				ind2 = unvisited.indexOf(URL);
+				
+				if(ind1 > -1)
+					unvisited.remove(ind1);
+				if(ind2 > -1)
+					allLinks.remove(ind2);
+				
 				saveState(state);
 				URL = nextUrl();
 				if(!URL.equals(""))
@@ -275,7 +424,7 @@ public class crawler implements Runnable
 				{
 					return;
 				}
-				e.printStackTrace();
+//				e.printStackTrace();
 			} 
 		}	
 	}
@@ -284,6 +433,7 @@ public class crawler implements Runnable
 	{
 		Set<String> visited = new LinkedHashSet<String>();
 		ArrayList<String> unvisited = new ArrayList<String>();
+		ArrayList<String> allLinks = new ArrayList<String>();
 		Thread[] threads;
 		String line;
 		int state = 0;
@@ -295,7 +445,8 @@ public class crawler implements Runnable
 
 		} catch(IOException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.out.println("The state file doesn't exist.\n");
 		}
 		
 		try(BufferedReader file = new BufferedReader(new FileReader(links_txt)))
@@ -313,18 +464,22 @@ public class crawler implements Runnable
 				{
 					unvisited.add(line);
 				}
+				
+				if(!allLinks.contains(line))
+					allLinks.add(line);
 			}
 
 		} catch(IOException e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.out.println("The links file doesn't exist.\n");
 		}
 		
 		threads = new Thread[nt];
 		
 		if(!unvisited.isEmpty())
 		{
-			crawler c1 = new crawler(visited, unvisited, 1, 10, state);
+			crawler c1 = new crawler(visited, unvisited, allLinks, 1, 10, state);
 			
 			for(int i = 0; i < nt; i++)
 			{
@@ -350,7 +505,7 @@ public class crawler implements Runnable
 		{
 			//defensive coding URL
 			unvisited.add("http://www.mkyong.com");
-			crawler c1 = new crawler(visited, unvisited, 1, 10, state);
+			crawler c1 = new crawler(visited, unvisited, allLinks, 1, 10, state);
 			
 			for(int i = 0; i < nt; i++)
 			{

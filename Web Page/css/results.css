@@ -1,6 +1,26 @@
+/*
 @import url('https://fonts.googleapis.com/css?family=Fascinate');
 @import url('https://fonts.googleapis.com/css?family=Pacifico');
 @import url('https://fonts.googleapis.com/css?family=Lato');
+*/
+
+@font-face
+{
+    font-family: Fascinate;
+    src: url('../fonts/Fascinate-Regular.ttf');
+}
+
+@font-face
+{
+    font-family: Pacifico;
+    src: url('../fonts/Pacifico-Regular.ttf');
+}
+
+@font-face
+{
+    font-family: Lato;
+    src: url('../fonts/Lato-Regular.ttf');
+}
 
 body
 {
@@ -217,6 +237,21 @@ body
     
     /* If you don't want header to be scrolled; don't forget to comment out scrolling under (#background) */
     /*overflow: scroll;*/
+}
+
+#results p
+{
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%);
+    
+    margin: 0px 0px 0px 0px;
+    
+    font-size: 5vw;    /*Setting this to % will not make it change with window-resizing*/
+    white-space: nowrap;
+    
+    color: darkgray;
 }
 
 .result_list
