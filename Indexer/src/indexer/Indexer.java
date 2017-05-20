@@ -204,6 +204,15 @@ public class Indexer
 				//Assuming there is always one <html> tag, thus of interest is only first one
 				Element content = contentAll.first();
 				
+				//Getting total count of words in HTML doc
+				String[] wordArray = content.text().trim().split("\\s");
+				int wordCount = wordArray.length;
+				
+				//Storing the total word count for the resp. doc ID in database
+				stt.execute("UPDATE doc_links"
+						+ " SET docWordCount = " + wordCount
+						+ " WHERE docID = " + lastID);
+				
 				//Getting the own text of each tag within content, then...
 				//...lower-casing, cleaning and storing each in an array...
 	            Elements contentTagsWithin = content.getAllElements();
