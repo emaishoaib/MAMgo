@@ -130,10 +130,10 @@
                     else
                     {
                         // Sending the query to Java for processing
-                        send_query($query);
+                        send_string_port($query, 1235);
                                
                         // Receiving response from Java; this response is the query after processing, but before stemming
-                        $respQuery = receive_response();                            
+                        $respQuery = receive_string_port(1236);                            
                     }
                 ?>
                     

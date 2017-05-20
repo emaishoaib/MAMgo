@@ -338,7 +338,7 @@ function get_n_following($text, $index, $num)
 }
 
 // Sending the user entered query as a string to Java for processing, then getting the OK from Java
-function send_query($query)
+function send_string_port($query, $port)
 {
     // PHP as client; Java as server
     
@@ -346,7 +346,7 @@ function send_query($query)
     $address = "localhost";
     
     // The port to work on shall be 1235
-    $service_port = 1235;
+    $service_port = $port;
     
     // Creating a TCP/IP socket
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -372,7 +372,7 @@ function send_query($query)
 }
 
 // Receiving response from Java server
-function receive_response()
+function receive_string_port($port)
 {
     // PHP as client; Java as server
     
@@ -380,7 +380,7 @@ function receive_response()
     $address = "localhost";
     
     // The port to work on shall be 1235
-    $service_port = 1236;
+    $service_port = $port;
     
     // Creating a TCP/IP socket
     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
