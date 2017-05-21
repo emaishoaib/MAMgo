@@ -406,6 +406,19 @@ public class crawler implements Runnable
 
 			} catch (IOException e) {
 				System.out.println("Error connecting to link\n");
+				
+				//********************
+				try(BufferedWriter file = new BufferedWriter(new FileWriter(htmls_folder + state + ".html"))) {
+
+					file.write("<html><title>Error Connecting to Link</title></html>");
+
+				} catch (IOException e1) {
+//					e.printStackTrace();
+					System.out.println("The specified path doesn't exist.");
+				}
+				state++;
+				//********************
+				
 				ind1 = unvisited.indexOf(URL);
 				ind2 = unvisited.indexOf(URL);
 				
