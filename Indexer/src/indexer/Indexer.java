@@ -154,6 +154,18 @@ public class Indexer
 				File file = new File(htmls_folder + lastID + ".html");
 	            Document doc = Jsoup.parse(file, "UTF-8");
 	            
+	            //Checking if HTML doc was actually empty for some reason
+	            Element entire = doc.select("html").first();	            
+	            if (entire.text().isEmpty())
+	            {
+	            	//Just add the docID and docLink to the database
+	            	stt.execute("INSERT INTO doc_links (docID, docLink)"
+							+ " VALUES (" + lastID + ", '" + link + "')");
+	            	
+	            	//Break the while loop, and continue for the next document
+	            	continue;
+	            }
+	            
 				//Extracting the first <title> tag from the HTML doc
 				Element titleFirst = doc.select("title").first();
 				String titleFirstStr = titleFirst.text();
