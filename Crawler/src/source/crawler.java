@@ -410,7 +410,7 @@ public class crawler implements Runnable
 				//********************
 				try(BufferedWriter file = new BufferedWriter(new FileWriter(htmls_folder + state + ".html"))) {
 
-					file.write("<html><title>Error Connecting to Link</title></html>");
+					file.write("<html></html>");
 
 				} catch (IOException e1) {
 //					e.printStackTrace();
@@ -426,6 +426,8 @@ public class crawler implements Runnable
 					unvisited.remove(ind1);
 				if(ind2 > -1)
 					allLinks.remove(ind2);
+				
+//				visited.remove(URL);
 				
 				saveState(state);
 				URL = nextUrl();
